@@ -1,0 +1,19 @@
+{
+  "grammars": [
+    {
+      "name": "ged",
+      "scope": "source.ged",
+      "file-types": [
+        "ged"
+      ],
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm",
+      "indents": "queries/indents.scm"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "GED language grammar for tree-sitter"
+  }
+}

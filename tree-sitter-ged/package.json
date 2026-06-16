@@ -1,0 +1,28 @@
+{
+  "name": "tree-sitter-ged",
+  "version": "0.1.0",
+  "description": "GED language grammar for tree-sitter",
+  "license": "MIT",
+  "main": "bindings/node",
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test",
+    "parse": "tree-sitter parse"
+  },
+  "dependencies": {
+    "nan": "*"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.26"
+  },
+  "tree-sitter": [
+    {
+      "scope": "source.ged",
+      "file-types": [
+        "ged"
+      ],
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm"
+    }
+  ]
+}

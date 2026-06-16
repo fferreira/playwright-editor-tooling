@@ -1,0 +1,556 @@
+==========================
+Empty file
+==========================
+
+---
+
+(program)
+
+==========================
+Simple fact
+==========================
+
++[run]
+
+---
+
+(program
+  (fact
+    (term_list (term (symbol)))))
+
+==========================
+Fact with multiple terms
+==========================
+
++[water[1], treasure[gold]]
+
+---
+
+(program
+  (fact
+    (term_list
+      (term (application head: (symbol) (term_list (term (number)))))
+      (term (application head: (symbol) (term_list (term (symbol))))))))
+
+==========================
+Empty fact
+==========================
+
++[]
+
+---
+
+(program
+  (fact))
+
+==========================
+Minimal named rule
+==========================
+
+rule done { run ==> }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow))))
+
+==========================
+Anonymous rule
+==========================
+
+rule { coin ==> gold }
+
+---
+
+(program
+  (rule_construct
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+Multi-body rule
+==========================
+
+rule get_input
+  { start, cli_input[X] ==> done }
+  { start ==> end }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (variable)))))))
+      (rule_arrow)
+      (term_list (term (symbol))))
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+Unicode arrow rule
+==========================
+
+rule go { start ⟹ done }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+Comparison guards
+==========================
+
+rule r { >[X, 0], <[X, 10], >=[A, B], <=[C, D], ==[E, F] ==> coin }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (cmp_guard left: (term (variable)) right: (term (number))))
+      (guard (cmp_guard left: (term (variable)) right: (term (number))))
+      (guard (cmp_guard left: (term (variable)) right: (term (variable))))
+      (guard (cmp_guard left: (term (variable)) right: (term (variable))))
+      (guard (cmp_guard left: (term (variable)) right: (term (variable))))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+Same and diff guards
+==========================
+
+rule r { foo, =[A, B], <>[C, D] ==> bar }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (guard (same_guard left: (term (variable)) right: (term (variable))))
+      (guard (diff_guard left: (term (variable)) right: (term (variable))))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+Negation guard (tilde)
+==========================
+
+rule r { run, ~done ==> go }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (guard (neg_guard term: (term (symbol))))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+Negation guard (Unicode not)
+==========================
+
+rule r { run, ¬done ==> go }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (guard (neg_guard term: (term (symbol))))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+True and false guards
+==========================
+
+rule r { (+) ==> yes }
+rule s { (-) ==> no }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (true_guard))
+      (rule_arrow)
+      (term_list (term (symbol)))))
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (false_guard))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+Variable as guard (bare variable is a term)
+==========================
+
+rule r { comp_remove[T], T ==> done }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (variable)))))))
+      (guard (pos_guard (term (variable))))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+Arithmetic: addition
+==========================
+
+rule r { num[X] ==> result[X + 1] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (variable)))))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term
+                (binary_expression
+                  left: (variable)
+                  right: (number))))))))))
+
+==========================
+Arithmetic: multiply and precedence
+==========================
+
+rule r { num[X] ==> result[X * 2 + 1] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (variable)))))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term
+                (binary_expression
+                  left: (binary_expression
+                    left: (variable)
+                    right: (number))
+                  right: (number))))))))))
+
+==========================
+Arithmetic: exponentiation (right-associative)
+==========================
+
+rule r { x ==> result[2 ^ 3 ^ 4] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term
+                (binary_expression
+                  left: (number)
+                  right: (binary_expression
+                    left: (number)
+                    right: (number)))))))))))
+
+==========================
+Arithmetic: unary minus
+==========================
+
+rule r { x ==> result[-1] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term (unary_expression operand: (number))))))))))
+
+==========================
+Arithmetic: parentheses
+==========================
+
+rule r { x ==> v[(X + 1)] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term
+                (binary_expression
+                  left: (variable)
+                  right: (number))))))))))
+
+==========================
+String literal
+==========================
+
+rule r { x ==> msg["hello world"] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term (string)))))))))
+
+==========================
+String with interpolation
+==========================
+
+rule r { x ==> say["You found {X}."] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term (string)))))))))
+
+==========================
+String with escape sequence
+==========================
+
+rule r { x ==> msg["line1\nline2"] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term (string)))))))))
+
+==========================
+String with comment-like content
+==========================
+
+rule r { x ==> say["// not a comment"] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term (string)))))))))
+
+==========================
+Special application
+==========================
+
+rule r { start, cli_input[X] ==> !read[X] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (variable)))))))
+      (rule_arrow)
+      (term_list
+        (term
+          (special_application head: (special) (term_list (term (variable)))))))))
+
+==========================
+Bare special atom
+==========================
+
+rule r { x ==> !done }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list (term (special))))))
+
+==========================
+Type signature block
+==========================
+
+{{
+  question : type
+  factorial : number -> question
+  answer : type
+  computing : number -> number -> answer
+}}
+
+---
+
+(program
+  (signature_block
+    (signature_item (type_declaration name: (symbol)))
+    (signature_item (constructor_signature name: (symbol)
+      (type_expr (base_type) (type_constructor (symbol)))))
+    (signature_item (type_declaration name: (symbol)))
+    (signature_item (constructor_signature name: (symbol)
+      (type_expr (base_type) (base_type) (type_constructor (symbol)))))))
+
+==========================
+Type with any type (star)
+==========================
+
+{{
+  comp_remove : * -> comp_token
+}}
+
+---
+
+(program
+  (signature_block
+    (signature_item (constructor_signature name: (symbol)
+      (type_expr (any_type) (type_constructor (symbol)))))))
+
+==========================
+Line comment
+==========================
+
+// This is a comment
++[run]
+
+---
+
+(program
+  (line_comment)
+  (fact (term_list (term (symbol)))))
+
+==========================
+Ged block comment
+==========================
+
+/- This is a block comment -/
++[run]
+
+---
+
+(program
+  (block_comment)
+  (fact (term_list (term (symbol)))))
+
+==========================
+C block comment
+==========================
+
+/* This is a C-style comment */
++[run]
+
+---
+
+(program
+  (block_comment)
+  (fact (term_list (term (symbol)))))
+
+==========================
+Full example: factorial rule and fact
+==========================
+
+rule fact_base_0 { factorial[0] ==> factorial_result[0, 1] }
+
++[factorial[20]]
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (number)))))))
+      (rule_arrow)
+      (term_list
+        (term (application head: (symbol)
+          (term_list
+            (term (number))
+            (term (number))))))))
+  (fact
+    (term_list (term (application head: (symbol) (term_list (term (number))))))))
