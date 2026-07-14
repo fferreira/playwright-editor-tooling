@@ -1,10 +1,5 @@
 [
   {
-    "type": "any_type",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "application",
     "named": true,
     "fields": {
@@ -57,6 +52,10 @@
           },
           {
             "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "list",
             "named": true
           },
           {
@@ -137,6 +136,10 @@
           },
           {
             "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "list",
             "named": true
           },
           {
@@ -276,6 +279,11 @@
     }
   },
   {
+    "type": "empty_list",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "fact",
     "named": true,
     "fields": {},
@@ -330,6 +338,29 @@
     }
   },
   {
+    "type": "list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "empty_list",
+          "named": true
+        },
+        {
+          "type": "non_empty_list",
+          "named": true
+        },
+        {
+          "type": "split_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "neg_guard",
     "named": true,
     "fields": {
@@ -357,6 +388,21 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "non_empty_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "term",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -479,6 +525,33 @@
     }
   },
   {
+    "type": "seq_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "any_type",
+          "named": true
+        },
+        {
+          "type": "base_type",
+          "named": true
+        },
+        {
+          "type": "type_constructor",
+          "named": true
+        },
+        {
+          "type": "type_expr",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "signature_block",
     "named": true,
     "fields": {},
@@ -539,6 +612,32 @@
     }
   },
   {
+    "type": "split_list",
+    "named": true,
+    "fields": {
+      "rest": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "term",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "term",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "term",
     "named": true,
     "fields": {},
@@ -552,6 +651,10 @@
         },
         {
           "type": "binary_expression",
+          "named": true
+        },
+        {
+          "type": "list",
           "named": true
         },
         {
@@ -648,6 +751,10 @@
           "named": true
         },
         {
+          "type": "seq_type",
+          "named": true
+        },
+        {
           "type": "type_constructor",
           "named": true
         },
@@ -680,6 +787,10 @@
           },
           {
             "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "list",
             "named": true
           },
           {
@@ -765,6 +876,10 @@
     "named": false
   },
   {
+    "type": "::",
+    "named": false
+  },
+  {
     "type": "<",
     "named": false
   },
@@ -807,6 +922,10 @@
   {
     "type": "^",
     "named": false
+  },
+  {
+    "type": "any_type",
+    "named": true
   },
   {
     "type": "block_comment",

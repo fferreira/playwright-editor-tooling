@@ -70,6 +70,7 @@
    :feature 'type
    '((base_type) @font-lock-type-face
      (any_type)  @font-lock-type-face
+     (seq_type "*" @font-lock-operator-face)
      (type_constructor (symbol) @font-lock-type-face))
 
    :language 'ged

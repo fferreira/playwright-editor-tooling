@@ -22,6 +22,16 @@ module.exports = grammar({
     $.block_comment,
   ],
 
+  // A closing ':' and an element-separating ':' are the same token, so at the
+  // ':' in `:a: - 1` the parser cannot yet tell a finished list followed by a
+  // subtraction from a list whose next element is the negative number `-1`.
+  // One token of lookahead is not enough; let the GLR parser carry both stacks
+  // until the ']' (or the missing one) decides it.
+  conflicts: $ => [
+    [$.non_empty_list, $.split_list],
+    [$.non_empty_list],
+  ],
+
   rules: {
     // ── Entry point ─────────────────────────────────────────────────────────
     program: $ => repeat(choice(
@@ -76,6 +86,15 @@ module.exports = grammar({
     ),
 
     _atomic_type: $ => choice(
+      $.seq_type,
+      $._simple_type,
+    ),
+
+    // A postfix '*' on a simple type: `fruit *` is a sequence of fruits, and
+    // `? *` a sequence of anything.
+    seq_type: $ => seq($._simple_type, '*'),
+
+    _simple_type: $ => choice(
       $.base_type,
       $.any_type,
       $.type_constructor,
@@ -83,7 +102,7 @@ module.exports = grammar({
     ),
 
     base_type: _ => choice('number', 'string'),
-    any_type: _ => '*',
+    any_type: _ => '?',
     type_constructor: $ => $.symbol,
 
     // ── Rules  rule [name] { guards ==> terms } ...  ────────────────────────
@@ -205,6 +224,7 @@ module.exports = grammar({
 
     _primary: $ => choice(
       seq('(', $._expression, ')'),
+      $.list,
       $.string,
       $.number,
       $.special_application,  // must precede $.special
@@ -212,6 +232,40 @@ module.exports = grammar({
       $.special,
       $.variable,
       $.symbol,
+    ),
+
+    // ── Sequence literals  ::  :a:  :a:b:  :X::REST:  ───────────────────────
+    //
+    // Colon-delimited, with a leading and a trailing colon.  ':' and '::' are
+    // separate tokens and the lexer takes the longest match, which is what makes
+    // the split form work: after the first element of `:X::REST:` the '::' is
+    // lexed whole, so REST is the rest of the sequence rather than a nested list.
+    // That is also why the doubled colon must be written without a space between
+    // the colons, and why a nested list is spaced away from its delimiters
+    // (`: :apple: :`, not `::apple::`, which would lex as two empty lists).
+    list: $ => choice(
+      $.empty_list,
+      $.split_list,
+      $.non_empty_list,
+    ),
+
+    empty_list: _ => '::',
+
+    non_empty_list: $ => seq(
+      ':',
+      $.term,
+      repeat(seq(':', $.term)),
+      ':',
+    ),
+
+    // Leading elements, then '::', then the rest of the sequence.
+    split_list: $ => seq(
+      ':',
+      $.term,
+      repeat(seq(':', $.term)),
+      '::',
+      field('rest', $.term),
+      ':',
     ),
 
     // f[arg, ...]  — application (functor symbol)

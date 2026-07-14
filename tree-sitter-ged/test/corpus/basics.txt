@@ -478,11 +478,11 @@ Type signature block
       (type_expr (base_type) (base_type) (type_constructor (symbol)))))))
 
 ==========================
-Type with any type (star)
+Type with any type (question mark)
 ==========================
 
 {{
-  comp_remove : * -> comp_token
+  comp_remove : ? -> comp_token
 }}
 
 ---
@@ -491,6 +491,101 @@ Type with any type (star)
   (signature_block
     (signature_item (constructor_signature name: (symbol)
       (type_expr (any_type) (type_constructor (symbol)))))))
+
+==========================
+Sequence types
+==========================
+
+{{
+  fill : fruit * -> cart
+  dump : ? * -> report
+  nest : (fruit -> cart) * -> report
+}}
+
+---
+
+(program
+  (signature_block
+    (signature_item (constructor_signature name: (symbol)
+      (type_expr
+        (seq_type (type_constructor (symbol)))
+        (type_constructor (symbol)))))
+    (signature_item (constructor_signature name: (symbol)
+      (type_expr
+        (seq_type (any_type))
+        (type_constructor (symbol)))))
+    (signature_item (constructor_signature name: (symbol)
+      (type_expr
+        (seq_type (type_expr (type_constructor (symbol)) (type_constructor (symbol))))
+        (type_constructor (symbol)))))))
+
+==========================
+Sequence literals
+==========================
+
++[fill[::], fill[:apple:], fill[:apple:banana:]]
+
+---
+
+(program
+  (fact
+    (term_list
+      (term (application head: (symbol)
+        (term_list (term (list (empty_list))))))
+      (term (application head: (symbol)
+        (term_list (term (list (non_empty_list (term (symbol))))))))
+      (term (application head: (symbol)
+        (term_list (term (list (non_empty_list (term (symbol)) (term (symbol)))))))))))
+
+==========================
+Nested sequence (spaced away from its delimiters)
+==========================
+
++[fill[: :apple: :]]
+
+---
+
+(program
+  (fact
+    (term_list
+      (term (application head: (symbol)
+        (term_list
+          (term (list (non_empty_list
+            (term (list (non_empty_list (term (symbol))))))))))))))
+
+==========================
+Split patterns, and a split as a cons in the give clause
+==========================
+
+rule take { fill[:X::REST:] ==> got[X], fill[REST] }
+rule two { fill[:X:Y::REST:] ==> fill[:Y::REST:] }
+
+---
+
+(program
+  (rule_construct name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (application head: (symbol)
+        (term_list (term (list (split_list
+          (term (variable))
+          rest: (term (variable))))))))))
+      (rule_arrow)
+      (term_list
+        (term (application head: (symbol) (term_list (term (variable)))))
+        (term (application head: (symbol) (term_list (term (variable))))))))
+  (rule_construct name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (application head: (symbol)
+        (term_list (term (list (split_list
+          (term (variable))
+          (term (variable))
+          rest: (term (variable))))))))))
+      (rule_arrow)
+      (term_list
+        (term (application head: (symbol)
+          (term_list (term (list (split_list
+            (term (variable))
+            rest: (term (variable))))))))))))
 
 ==========================
 Line comment
