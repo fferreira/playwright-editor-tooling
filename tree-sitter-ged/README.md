@@ -199,7 +199,7 @@ rule {
 }}
 ```
 
-See `crates/ged/examples/` for larger examples.
+See `ged/test/corpus/` for larger examples.
 
 ---
 
