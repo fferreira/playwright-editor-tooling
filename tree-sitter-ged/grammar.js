@@ -1,6 +1,6 @@
 /**
  * @file Tree-sitter grammar for the GED language
- * @see crates/ged/src/ged.pest — authoritative pest grammar (source of truth)
+ * @see ged/lib/grammar.mly — the authoritative grammar (source of truth)
  * @license MIT
  */
 
