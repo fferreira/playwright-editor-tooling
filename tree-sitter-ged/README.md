@@ -2,7 +2,7 @@
 
 [Tree-sitter](https://tree-sitter.github.io/) grammar for the **GED** language — a
 term-rewriting language used in the
-[Playwright project](https://github.com/playwright-project).
+[Playwright project](https://github.com/fferreira/playwright).
 
 Provides syntax highlighting and basic indentation support for **Helix** and **Emacs**.
 

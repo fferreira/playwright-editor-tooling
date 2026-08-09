@@ -4,7 +4,7 @@
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, tree-sitter, ged
-;; URL: https://github.com/playwright-project
+;; URL: https://github.com/fferreira/playwright
 
 ;;; Commentary:
 
