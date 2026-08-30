@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# install-emacs.sh — compile the GED tree-sitter shared library and install
-#                    ged-ts-mode.el for Emacs 29+ built-in tree-sitter support.
+# install-emacs.sh — compile the CORE tree-sitter shared library and install
+#                    playwright-core-ts-mode.el for Emacs 29+ built-in tree-sitter support.
 #
 # Idempotent: safe to run multiple times.
 set -euo pipefail
@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 CRATE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 PARSER_C="$CRATE_DIR/src/parser.c"
-EL_SRC="$CRATE_DIR/editors/ged-ts-mode.el"
+EL_SRC="$CRATE_DIR/editors/playwright-core-ts-mode.el"
 
 # ── Determine shared library suffix ─────────────────────────────────────────
 case "$(uname -s)" in
@@ -17,7 +17,7 @@ case "$(uname -s)" in
     *)      SOEXT="so"    ;;
 esac
 
-LIB_NAME="libtree-sitter-ged.$SOEXT"
+LIB_NAME="libtree-sitter-playwright-core.$SOEXT"
 
 # Emacs looks for tree-sitter grammars in `treesit-extra-load-path` or the
 # default directory ~/.emacs.d/tree-sitter/.  We install into the latter.
@@ -46,17 +46,17 @@ cc \
     "$PARSER_C"
 echo "Installed: $LIB_OUT"
 
-# ── Install ged-ts-mode.el ────────────────────────────────────────────────────
-EL_DST="$LISP_DIR/ged-ts-mode.el"
+# ── Install playwright-core-ts-mode.el ────────────────────────────────────────────────────
+EL_DST="$LISP_DIR/playwright-core-ts-mode.el"
 cp "$EL_SRC" "$EL_DST"
 echo "Installed: $EL_DST"
 
 # ── Patch init.el (idempotent) ────────────────────────────────────────────────
 INIT_FILE="${EMACS_INIT:-$HOME/.emacs.d/init.el}"
-MARKER=";;; >>> tree-sitter-ged"
+MARKER=";;; >>> tree-sitter-playwright-core"
 
 if [ -f "$INIT_FILE" ] && grep -q "$MARKER" "$INIT_FILE"; then
-    echo "init.el: GED block already present (skipping)"
+    echo "init.el: CORE block already present (skipping)"
 else
     if [ -f "$INIT_FILE" ]; then
         echo "Patching $INIT_FILE …"
@@ -64,8 +64,8 @@ else
 
 $MARKER
 (add-to-list 'load-path "$LISP_DIR")
-(require 'ged-ts-mode)
-;;; <<< tree-sitter-ged
+(require 'playwright-core-ts-mode)
+;;; <<< tree-sitter-playwright-core
 ELISP
         echo "Patched $INIT_FILE"
     else
@@ -74,7 +74,7 @@ ELISP
         echo "Add the following to your Emacs init file manually:"
         echo ""
         echo "  (add-to-list 'load-path \"$LISP_DIR\")"
-        echo "  (require 'ged-ts-mode)"
+        echo "  (require 'playwright-core-ts-mode)"
     fi
 fi
 
@@ -83,5 +83,5 @@ echo "Done."
 echo ""
 echo "To verify in Emacs:"
 echo "  M-x treesit-available-p          ; should return t"
-echo "  (treesit-language-available-p 'ged) ; should return t after loading"
-echo "  M-x ged-ts-mode                  ; on any .ged buffer"
+echo "  (treesit-language-available-p 'playwright_core) ; should return t after loading"
+echo "  M-x playwright-core-ts-mode                  ; on any .playwright_core buffer"

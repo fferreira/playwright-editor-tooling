@@ -1,6 +1,6 @@
-# tree-sitter-ged
+# tree-sitter-playwright-core
 
-[Tree-sitter](https://tree-sitter.github.io/) grammar for the **GED** language — a
+[Tree-sitter](https://tree-sitter.github.io/) grammar for the **CORE** language — a
 term-rewriting language used in the
 [Playwright project](https://github.com/fferreira/playwright).
 
@@ -11,7 +11,7 @@ Provides syntax highlighting and basic indentation support for **Helix** and **E
 ## Repository layout
 
 ```
-crates/tree-sitter-ged/
+crates/tree-sitter-playwright-core/
   grammar.js                 # grammar source (edit this)
   tree-sitter.json           # grammar metadata
   Cargo.toml                 # Rust binding crate (standalone, not a workspace member)
@@ -25,11 +25,11 @@ crates/tree-sitter-ged/
   src/grammar.json           # GENERATED
   src/node-types.json        # GENERATED
   editors/
-    ged-ts-mode.el           # Emacs 29+ major mode
+    playwright-core-ts-mode.el           # Emacs 29+ major mode
   scripts/
     generate.sh              # regenerates src/ from grammar.js
     install-helix.sh         # wires grammar into ~/.config/helix/
-    install-emacs.sh         # compiles shared lib + installs ged-ts-mode.el
+    install-emacs.sh         # compiles shared lib + installs playwright-core-ts-mode.el
   test/corpus/basics.txt     # tree-sitter corpus tests
 ```
 
@@ -44,14 +44,14 @@ Rebuild only when you change `grammar.js`:
 # Prerequisites: Node.js + tree-sitter CLI
 npm install -g tree-sitter-cli
 
-cd crates/tree-sitter-ged
+cd crates/tree-sitter-playwright-core
 ./scripts/generate.sh   # runs tree-sitter generate
 ```
 
 ### Running corpus tests
 
 ```sh
-cd crates/tree-sitter-ged
+cd crates/tree-sitter-playwright-core
 tree-sitter test
 ```
 
@@ -60,7 +60,7 @@ All 31 test cases in `test/corpus/basics.txt` should pass.
 ### Running Rust binding tests
 
 ```sh
-cd crates/tree-sitter-ged
+cd crates/tree-sitter-playwright-core
 cargo test
 ```
 
@@ -71,25 +71,25 @@ cargo test
 ### Install
 
 ```sh
-cd crates/tree-sitter-ged
+cd crates/tree-sitter-playwright-core
 ./scripts/install-helix.sh
 ```
 
 The script:
 
 1. Appends a guarded block (idempotent — safe to run again) to
-   `~/.config/helix/languages.toml` that declares the `ged` language and points the
+   `~/.config/helix/languages.toml` that declares the `playwright_core` language and points the
    grammar source at this directory.
-2. Copies `queries/*.scm` to `~/.config/helix/runtime/queries/ged/`.
+2. Copies `queries/*.scm` to `~/.config/helix/runtime/queries/playwright_core/`.
 3. Runs `hx --grammar build` to compile the grammar (if `hx` is on your `PATH`).
 
 Verify the installation:
 
 ```sh
-hx --health ged
+hx --health playwright_core
 ```
 
-Then open any `.ged` file in Helix — syntax highlighting should be active.
+Then open any `.core` file in Helix — syntax highlighting should be active.
 
 ### Manual config
 
@@ -97,18 +97,18 @@ Add the following to `~/.config/helix/languages.toml`, adjusting the path:
 
 ```toml
 [[language]]
-name = "ged"
-scope = "source.ged"
-file-types = ["ged"]
+name = "playwright_core"
+scope = "source.playwright-core"
+file-types = ["playwright_core"]
 comment-token = "//"
 indent = { tab-width = 4, unit = "    " }
 
 [[grammar]]
-name = "ged"
-source = { path = "/absolute/path/to/crates/tree-sitter-ged" }
+name = "playwright_core"
+source = { path = "/absolute/path/to/crates/tree-sitter-playwright-core" }
 ```
 
-Then copy `queries/*.scm` to `~/.config/helix/runtime/queries/ged/` and run
+Then copy `queries/*.scm` to `~/.config/helix/runtime/queries/playwright_core/` and run
 `hx --grammar build`.
 
 ---
@@ -120,32 +120,32 @@ Requires **Emacs 29+** built with tree-sitter support (`--with-tree-sitter`).
 ### Install
 
 ```sh
-cd crates/tree-sitter-ged
+cd crates/tree-sitter-playwright-core
 ./scripts/install-emacs.sh
 ```
 
 The script:
 
 1. Compiles `src/parser.c` into a shared library
-   (`libtree-sitter-ged.dylib` on macOS, `.so` on Linux) and installs it into
+   (`libtree-sitter-playwright-core.dylib` on macOS, `.so` on Linux) and installs it into
    `~/.emacs.d/tree-sitter/` (where Emacs looks for grammars by default).
-2. Copies `editors/ged-ts-mode.el` to `~/.emacs.d/lisp/`.
+2. Copies `editors/playwright-core-ts-mode.el` to `~/.emacs.d/lisp/`.
 3. Appends a guarded block (idempotent) to `~/.emacs.d/init.el`:
    ```elisp
    (add-to-list 'load-path "~/.emacs.d/lisp/")
-   (require 'ged-ts-mode)
+   (require 'playwright-core-ts-mode)
    ```
 
-Restart Emacs and open any `.ged` file — `ged-ts-mode` activates automatically.
+Restart Emacs and open any `.core` file — `playwright-core-ts-mode` activates automatically.
 
 ### Verify in Emacs
 
 ```elisp
 (treesit-available-p)          ; => t
-(treesit-language-available-p 'ged)  ; => t  (after ged-ts-mode loads)
+(treesit-language-available-p 'playwright_core)  ; => t  (after playwright-core-ts-mode loads)
 ```
 
-Or `M-x ged-ts-mode` in any `.ged` buffer.
+Or `M-x playwright-core-ts-mode` in any `.core` buffer.
 
 ### Manual installation
 
@@ -154,26 +154,26 @@ If you prefer not to run the script:
 ```sh
 # 1. Compile the shared library
 cc -shared -fPIC \
-   -o ~/.emacs.d/tree-sitter/libtree-sitter-ged.dylib \
+   -o ~/.emacs.d/tree-sitter/libtree-sitter-playwright-core.dylib \
    -I src \
    src/parser.c
 
 # 2. Copy the Emacs mode
-cp editors/ged-ts-mode.el ~/.emacs.d/lisp/
+cp editors/playwright-core-ts-mode.el ~/.emacs.d/lisp/
 ```
 
 Then add to your `init.el`:
 
 ```elisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
-(require 'ged-ts-mode)
+(require 'playwright-core-ts-mode)
 ```
 
 ---
 
-## GED language quick reference
+## CORE language quick reference
 
-```ged
+```playwright_core
 // Line comment
 /- block comment -/
 
@@ -199,7 +199,7 @@ rule {
 }}
 ```
 
-See `ged/test/corpus/` for larger examples.
+See `playwright_core/test/corpus/` for larger examples.
 
 ---
 

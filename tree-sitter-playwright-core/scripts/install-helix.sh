@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install-helix.sh — wire tree-sitter-ged into the Helix editor
+# install-helix.sh — wire tree-sitter-playwright-core into the Helix editor
 #
 # Idempotent: safe to run multiple times.
 # Run from any directory; it uses absolute paths throughout.
@@ -13,29 +13,29 @@ HX_CFG="${XDG_CONFIG_HOME:-$HOME/.config}/helix"
 mkdir -p "$HX_CFG"
 
 LANG_TOML="$HX_CFG/languages.toml"
-QUERIES_DIR="$HX_CFG/runtime/queries/ged"
+QUERIES_DIR="$HX_CFG/runtime/queries/playwright_core"
 
-MARKER_START="# >>> tree-sitter-ged"
-MARKER_END="# <<< tree-sitter-ged"
+MARKER_START="# >>> tree-sitter-playwright-core"
+MARKER_END="# <<< tree-sitter-playwright-core"
 
 # ── languages.toml ──────────────────────────────────────────────────────────
 if grep -q "$MARKER_START" "$LANG_TOML" 2>/dev/null; then
-    echo "languages.toml: GED block already present (skipping)"
+    echo "languages.toml: CORE block already present (skipping)"
 else
-    echo "languages.toml: adding GED language and grammar entries"
+    echo "languages.toml: adding CORE language and grammar entries"
     cat >> "$LANG_TOML" << TOML
 
 $MARKER_START
 [[language]]
-name = "ged"
-scope = "source.ged"
-file-types = ["ged"]
-grammar = "ged"
+name = "playwright_core"
+scope = "source.playwright-core"
+file-types = ["playwright_core"]
+grammar = "playwright_core"
 comment-token = "//"
 indent = { tab-width = 4, unit = "    " }
 
 [[grammar]]
-name = "ged"
+name = "playwright_core"
 source = { path = "$CRATE_DIR" }
 $MARKER_END
 TOML
@@ -63,25 +63,25 @@ fi
 mkdir -p "$HX_CFG/runtime/grammars"
 
 if command -v hx >/dev/null 2>&1; then
-    echo "Compiling ged grammar (hx --grammar build)…"
+    echo "Compiling the grammar (hx --grammar build)…"
     # Suppress the flood of "Failure: ... did you use hx --grammar fetch?" lines
-    # for built-in grammars; only print ged-specific failures if any.
-    hx --grammar build 2>&1 | grep -i 'failure.*ged\|ged.*fail' || true
-    GED_SO="$HX_CFG/runtime/grammars/ged.so"
-    if [ -f "$GED_SO" ]; then
-        echo "ged grammar compiled: $GED_SO"
+    # for built-in grammars; only print grammar-specific failures if any.
+    hx --grammar build 2>&1 | grep -i 'failure.*playwright_core\|playwright_core.*fail' || true
+    GRAMMAR_SO="$HX_CFG/runtime/grammars/playwright_core.so"
+    if [ -f "$GRAMMAR_SO" ]; then
+        echo "grammar compiled: $GRAMMAR_SO"
     else
-        echo "ERROR: $GED_SO was not produced — compilation failed." >&2
+        echo "ERROR: $GRAMMAR_SO was not produced — compilation failed." >&2
         exit 1
     fi
     echo ""
-    echo "Run 'hx --health ged' to verify the installation."
+    echo "Run 'hx --health playwright_core' to verify the installation."
 else
     echo ""
     echo "Note: 'hx' not found on PATH."
     echo "After installing Helix, run: hx --grammar build"
-    echo "Then verify with:           hx --health ged"
+    echo "Then verify with:           hx --health playwright_core"
 fi
 
 echo ""
-echo "Done.  Open any .ged file in Helix to see syntax highlighting."
+echo "Done.  Open any `.core` file in Helix to see syntax highlighting."

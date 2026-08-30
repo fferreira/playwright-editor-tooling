@@ -1,10 +1,10 @@
 {
   "grammars": [
     {
-      "name": "ged",
-      "scope": "source.ged",
+      "name": "playwright_core",
+      "scope": "source.playwright-core",
       "file-types": [
-        "ged"
+        "core"
       ],
       "highlights": "queries/highlights.scm",
       "injections": "queries/injections.scm",
@@ -14,6 +14,6 @@
   "metadata": {
     "version": "0.1.0",
     "license": "MIT",
-    "description": "GED language grammar for tree-sitter"
+    "description": "Core Playwright grammar for tree-sitter"
   }
 }

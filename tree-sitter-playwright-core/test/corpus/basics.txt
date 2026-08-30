@@ -601,7 +601,7 @@ Line comment
   (fact (term_list (term (symbol)))))
 
 ==========================
-Ged block comment
+Core block comment
 ==========================
 
 /- This is a block comment -/

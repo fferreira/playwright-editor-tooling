@@ -1,7 +1,7 @@
 {
-  "name": "tree-sitter-ged",
+  "name": "tree-sitter-playwright-core",
   "version": "0.1.0",
-  "description": "GED language grammar for tree-sitter",
+  "description": "Core Playwright grammar for tree-sitter",
   "license": "MIT",
   "main": "bindings/node",
   "scripts": {
@@ -17,9 +17,9 @@
   },
   "tree-sitter": [
     {
-      "scope": "source.ged",
+      "scope": "source.playwright-core",
       "file-types": [
-        "ged"
+        "core"
       ],
       "highlights": "queries/highlights.scm",
       "injections": "queries/injections.scm"

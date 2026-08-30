@@ -1,6 +1,6 @@
 /**
- * @file Tree-sitter grammar for the GED language
- * @see ged/lib/grammar.mly — the authoritative grammar (source of truth)
+ * @file Tree-sitter grammar for Core Playwright, the `.core` IR
+ * @see play/lib/grammar.mly — the authoritative grammar (source of truth)
  * @license MIT
  */
 
@@ -8,7 +8,7 @@
 // @ts-check
 
 module.exports = grammar({
-  name: 'ged',
+  name: 'playwright_core',
 
   // 'rule' is a keyword; 'type', 'number', 'string' are keywords inside
   // signature blocks.  Declaring the word token enables keyword extraction:

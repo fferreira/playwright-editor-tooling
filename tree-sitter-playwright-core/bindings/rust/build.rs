@@ -6,5 +6,5 @@ fn main() {
         .flag_if_supported("-Wno-unused-parameter")
         .flag_if_supported("-Wno-unused-but-set-variable")
         .flag_if_supported("-Wno-trigraphs");
-    c_config.file(src_dir.join("parser.c")).compile("tree-sitter-ged");
+    c_config.file(src_dir.join("parser.c")).compile("tree-sitter-playwright-core");
 }

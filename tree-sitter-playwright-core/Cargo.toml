@@ -1,11 +1,11 @@
 [package]
-name = "tree-sitter-ged"
-description = "GED language grammar for tree-sitter"
+name = "tree-sitter-playwright-core"
+description = "Core Playwright grammar for tree-sitter"
 version = "0.1.0"
 authors = ["Francisco Ferreira"]
 license = "MIT"
 readme = "README.md"
-keywords = ["incremental", "parsing", "tree-sitter", "ged", "playwright"]
+keywords = ["incremental", "parsing", "tree-sitter", "playwright_core", "playwright"]
 categories = ["parser-implementations", "parsing", "text-editors"]
 edition = "2021"
 autoexamples = false
