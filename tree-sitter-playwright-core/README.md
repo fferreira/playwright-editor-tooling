@@ -8,6 +8,42 @@ Provides syntax highlighting and basic indentation support for **Helix** and **E
 
 ---
 
+> **Known gap: the `story { … }` section.** The core language gained one when the
+> story machine joined the IR — `story { moment L kind -> N { item { … } } }`,
+> what `playc --compile` now writes and what `doc/core.md` specifies. This
+> grammar predates it and does not parse it, so a storied `.core` highlights as
+> far as the section and then stops making sense.
+>
+> It is a follow-up rather than a blocker, and deliberately so: this crate is
+> outside the workspace, publish-shaped and on its own cadence, and nothing in
+> the repository's gates reads it. Adding the section means five keywords
+> (`story`, `moment`, `prompt`, `choice`, `item` — each already re-admitted as an
+> ordinary symbol by the real grammar, which this one must match), three tokens
+> (`=>`, `+=`, `-=`), and highlight captures for the new nodes.
+
+> **Known gap: three grammar changes it predates.** The real grammar moved under
+> it when the printer became a bijection (`to_review.md` R58, R68), and each
+> change is invisible to a highlighter until it is not:
+>
+> - **A nested sequence is parenthesised**, `:(:a:b:):c:`, where the printer used
+>   to pad with a space. `( term )` is an ordinary primary, so this parses here
+>   already — but the padded form no longer appears and any test fixture spelling
+>   it that way is stale.
+> - **A numeric literal spans the whole signed range.** The real lexer reads
+>   `digit+` and the *grammar* applies the sign before converting, so
+>   `-9223372036854775808` is a literal. `number: /\d+/` here matches the digits
+>   the same way, so nothing breaks; what is stale is any comment claiming the
+>   magnitude has no spelling.
+> - **The string lexer decodes only its own escapes.** `\"`, `\n`, `\r` and
+>   `\t` belong to the quoted-literal layer; `\\`, `\{` and `\}` belong to the
+>   template layer underneath and are passed through verbatim. `/\\./` here
+>   accepts all of them as one token, which is right for highlighting — but the
+>   comment above it lists them as one flat set, and the two layers are the thing
+>   worth saying.
+>
+> Like the `story` gap, a follow-up rather than a blocker, for the same reason:
+> nothing in the repository's gates reads this grammar.
+
 ## Repository layout
 
 ```
