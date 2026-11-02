@@ -56,7 +56,8 @@
    :language 'playwright_core
    :feature 'keyword
    '("rule" @font-lock-keyword-face
-     "type" @font-lock-keyword-face)
+     "type" @font-lock-keyword-face
+     "extern" @font-lock-keyword-face)
 
    :language 'playwright_core
    :feature 'string
@@ -98,6 +99,7 @@
    :feature 'operator
    '((rule_arrow) @font-lock-operator-face
      (neg_guard operator: _ @font-lock-operator-face)
+     (keep_guard operator: _ @font-lock-operator-face)
      (cmp_guard operator: _ @font-lock-operator-face)
      (binary_expression operator: _ @font-lock-operator-face)
      (unary_expression  operator: _ @font-lock-operator-face)

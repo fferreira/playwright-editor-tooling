@@ -649,3 +649,54 @@ rule fact_base_0 { factorial[0] ==> factorial_result[0, 1] }
             (term (number))))))))
   (fact
     (term_list (term (application head: (symbol) (term_list (term (number))))))))
+
+==========================
+Keep guard
+==========================
+
+rule sprout { $seed, ~sprouted ==> sprouted }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (keep_guard term: (term (symbol))))
+      (guard (neg_guard term: (term (symbol))))
+      (rule_arrow)
+      (term_list (term (symbol))))))
+
+==========================
+Host-owned facts
+==========================
+
+extern { player_at[X, Y], entity[K, X, Y] }
+rule spot { player_at[X, Y], treasure[X, Y], ~found[X, Y] ==> found[X, Y] }
+
+---
+
+(program
+  (extern_declaration
+    (term_list
+      (term (application head: (symbol) (term_list (term (variable)) (term (variable)))))
+      (term (application head: (symbol) (term_list (term (variable)) (term (variable)) (term (variable)))))))
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (variable)) (term (variable)))))))
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (variable)) (term (variable)))))))
+      (guard (neg_guard term: (term (application head: (symbol) (term_list (term (variable)) (term (variable)))))))
+      (rule_arrow)
+      (term_list (term (application head: (symbol) (term_list (term (variable)) (term (variable)))))))))
+
+==========================
+extern is still a term
+==========================
+
++[extern[1]]
+
+---
+
+(program
+  (fact (term_list (term (application head: (symbol) (term_list (term (number))))))))

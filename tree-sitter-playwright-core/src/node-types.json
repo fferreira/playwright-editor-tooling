@@ -284,6 +284,21 @@
     "fields": {}
   },
   {
+    "type": "extern_declaration",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "term_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "fact",
     "named": true,
     "fields": {},
@@ -319,6 +334,10 @@
           "named": true
         },
         {
+          "type": "keep_guard",
+          "named": true
+        },
+        {
           "type": "neg_guard",
           "named": true
         },
@@ -335,6 +354,32 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "keep_guard",
+    "named": true,
+    "fields": {
+      "operator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "$",
+            "named": false
+          }
+        ]
+      },
+      "term": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "term",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -429,6 +474,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "extern_declaration",
+          "named": true
+        },
         {
           "type": "fact",
           "named": true
@@ -836,6 +885,10 @@
     }
   },
   {
+    "type": "$",
+    "named": false
+  },
+  {
     "type": "%",
     "named": false
   },
@@ -931,6 +984,10 @@
     "type": "block_comment",
     "named": true,
     "extra": true
+  },
+  {
+    "type": "extern",
+    "named": false
   },
   {
     "type": "false_guard",

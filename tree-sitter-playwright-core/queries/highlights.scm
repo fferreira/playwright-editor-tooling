@@ -4,6 +4,7 @@
 ; ── Keywords ────────────────────────────────────────────────────────────────
 "rule" @keyword
 "type" @keyword
+"extern" @keyword
 
 ; ── Rule and function names ─────────────────────────────────────────────────
 ; Rule names come first so they win over the generic @constant below.
@@ -37,6 +38,7 @@
 
 (cmp_guard  operator: _ @operator)
 (neg_guard  operator: _ @operator)
+(keep_guard operator: _ @operator)
 (binary_expression operator: _ @operator)
 (unary_expression  operator: _ @operator)
 

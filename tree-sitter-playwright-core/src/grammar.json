@@ -19,9 +19,42 @@
           {
             "type": "SYMBOL",
             "name": "fact"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "extern_declaration"
           }
         ]
       }
+    },
+    "extern_declaration": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "extern"
+        },
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "term_list"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
     },
     "fact": {
       "type": "SEQ",
@@ -381,6 +414,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "keep_guard"
+        },
+        {
+          "type": "SYMBOL",
           "name": "pos_guard"
         }
       ]
@@ -547,6 +584,27 @@
                 "value": "¬"
               }
             ]
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "term",
+          "content": {
+            "type": "SYMBOL",
+            "name": "term"
+          }
+        }
+      ]
+    },
+    "keep_guard": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "operator",
+          "content": {
+            "type": "STRING",
+            "value": "$"
           }
         },
         {

@@ -38,7 +38,21 @@ module.exports = grammar({
       $.signature_block,
       $.rule_construct,
       $.fact,
+      $.extern_declaration,
     )),
+
+    // ── Host-owned facts  extern { player_at[X, Y], ... }  ─────────────────
+    //
+    // Facts the embedding program owns, which the story reads and never
+    // changes. Braces rather than a bare list, as in grammar.mly, because a
+    // bare list has no end. Each term names a shape by head and arity; the
+    // compiler refuses an empty declaration, which this grammar leaves to it.
+    extern_declaration: $ => seq(
+      'extern',
+      '{',
+      optional($.term_list),
+      '}',
+    ),
 
     // ── Facts  +[term, ...]  ────────────────────────────────────────────────
     fact: $ => seq(
@@ -137,6 +151,7 @@ module.exports = grammar({
       $.true_guard,   // (+)
       $.false_guard,  // (-)
       $.neg_guard,    // ~ term  or  ¬ term
+      $.keep_guard,   // $ term
       $.pos_guard,    // term  (positive / consuming guard)
     ),
 
@@ -177,6 +192,14 @@ module.exports = grammar({
     // Negation guard:  ~term  or  ¬term
     neg_guard: $ => seq(
       field('operator', choice('~', '¬')),
+      field('term', $.term),
+    ),
+
+    // Keep guard:  $term — take the fact and give it back, as in Ceptre.
+    // Only a rule's take admits one, and that is the only guard list this
+    // grammar has; grammar.mly expands it into the take plus a give-back.
+    keep_guard: $ => seq(
+      field('operator', '$'),
       field('term', $.term),
     ),
 
