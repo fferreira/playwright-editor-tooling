@@ -8,41 +8,32 @@ Provides syntax highlighting and basic indentation support for **Helix** and **E
 
 ---
 
-> **Known gap: the `story { … }` section.** The core language gained one when the
-> story machine joined the IR — `story { moment L kind -> N { item { … } } }`,
-> what `playc --compile` now writes and what `doc/core.md` specifies. This
-> grammar predates it and does not parse it, so a storied `.core` highlights as
-> far as the section and then stops making sense.
->
-> It is a follow-up rather than a blocker, and deliberately so: this crate is
-> outside the workspace, publish-shaped and on its own cadence, and nothing in
-> the repository's gates reads it. Adding the section means five keywords
-> (`story`, `moment`, `prompt`, `choice`, `item` — each already re-admitted as an
-> ordinary symbol by the real grammar, which this one must match), three tokens
-> (`=>`, `+=`, `-=`), and highlight captures for the new nodes.
+## What it covers
 
-> **Known gap: three grammar changes it predates.** The real grammar moved under
-> it when the printer became a bijection (`to_review.md` R58, R68), and each
-> change is invisible to a highlighter until it is not:
->
-> - **A nested sequence is parenthesised**, `:(:a:b:):c:`, where the printer used
->   to pad with a space. `( term )` is an ordinary primary, so this parses here
->   already — but the padded form no longer appears and any test fixture spelling
->   it that way is stale.
-> - **A numeric literal spans the whole signed range.** The real lexer reads
->   `digit+` and the *grammar* applies the sign before converting, so
->   `-9223372036854775808` is a literal. `number: /\d+/` here matches the digits
->   the same way, so nothing breaks; what is stale is any comment claiming the
->   magnitude has no spelling.
-> - **The string lexer decodes only its own escapes.** `\"`, `\n`, `\r` and
->   `\t` belong to the quoted-literal layer; `\\`, `\{` and `\}` belong to the
->   template layer underneath and are passed through verbatim. `/\\./` here
->   accepts all of them as one token, which is right for highlighting — but the
->   comment above it lists them as one flat set, and the two layers are the thing
->   worth saying.
->
-> Like the `story` gap, a follow-up rather than a blocker, for the same reason:
-> nothing in the repository's gates reads this grammar.
+The whole `.core` language as `core/play/lib/grammar.mly` and `lexer.mll` have
+it — the source of truth, in the playwright-core submodule — and every `.core`
+file core ships parses without an error, as does everything `playc --compile`
+writes for core's `.play` files. In particular:
+
+- **The `story { … }` section**: moments, items with their `+=[…]`/`-=[…]`
+  clauses and targets, and encounters. The six story words are keywords only
+  where they shape a story node and ordinary symbols everywhere else, as the
+  real grammar re-admits them — `choice[2]` in an encounter's trigger is a term.
+- **`#line N "file"` directives**, which `playc --compile` writes by default.
+  They are an extra, so one may stand between any two tokens.
+- **`!!fn[a, b]` and a bare `!!fn`**, the host-call shorthand for
+  `!ffi["fn", a, b]` (`host_call`). Both real parsers expand it before anything
+  else sees it, and the printer writes the expansion, so it only ever appears
+  in hand-written text — which is exactly the text an editor is for.
+
+Two things are approximations, both harmless to a highlighter: block comments
+do not nest here (the real lexer nests them), and a string is one token, so
+`{Var}` interpolations inside it are not separate nodes (an external scanner
+would be needed — see the comment in `grammar.js`).
+
+This crate is outside the workspace and nothing in the repository's gates reads
+it, so keeping it in step with core is a manual job: when core's grammar moves,
+parse core's corpus with it (below) and add a corpus test for the new shape.
 
 ## Repository layout
 
@@ -91,7 +82,22 @@ cd crates/tree-sitter-playwright-core
 tree-sitter test
 ```
 
-All 31 test cases in `test/corpus/basics.txt` should pass.
+All 45 test cases in `test/corpus/basics.txt` should pass.
+
+### Parsing core's own corpus
+
+The corpus tests pin shapes; core's `.core` files are the check that the
+grammar has not fallen behind. From this directory, with the submodule checked
+out:
+
+```sh
+git -C ../../core ls-files '*.core' | sed 's|^|../../core/|' \
+  | while read -r f; do [ -L "$f" ] || echo "$f"; done > /tmp/core-files.txt
+tree-sitter parse -p . --quiet --stat --paths /tmp/core-files.txt
+```
+
+Every file should parse (the symlinked fixtures are skipped because they point
+at files already in the list).
 
 ### Running Rust binding tests
 
@@ -127,6 +133,11 @@ hx --health playwright_core
 
 Then open any `.core` file in Helix — syntax highlighting should be active.
 
+The script leaves an existing block alone, and versions before this one wrote
+`file-types = ["playwright_core"]`, which matches no `.core` file. If yours says
+that, delete the block between the `tree-sitter-playwright-core` markers in
+`languages.toml` and run the script again.
+
 ### Manual config
 
 Add the following to `~/.config/helix/languages.toml`, adjusting the path:
@@ -135,7 +146,7 @@ Add the following to `~/.config/helix/languages.toml`, adjusting the path:
 [[language]]
 name = "playwright_core"
 scope = "source.playwright-core"
-file-types = ["playwright_core"]
+file-types = ["core"]
 comment-token = "//"
 indent = { tab-width = 4, unit = "    " }
 
@@ -225,7 +236,7 @@ rule increment {
 rule {
     base[0] ==> done
 } {
-    step[N], N > 0 ==> step[N - 1]
+    step[N], >[N, 0] ==> step[N - 1]
 }
 
 // Type signature block
@@ -233,9 +244,27 @@ rule {
     counter : type
     counter : number -> counter
 }}
+
+// Facts the host owns: the story reads them and never changes them
+extern { player_at[X, Y] }
+
+// Ask the host: !!roll[6] is !ffi["roll", 6], and a bare !!clock is !ffi["clock"]
+rule ask { asking ==> rolled[!!roll[6]], now[!!clock] }
+
+// The story section, as playc --compile writes it
+story {
+    encounter comp_m1 { choice[2], ~seen }
+    moment comp_m0 choice -> comp_end {
+        item { => "Open it." +=[player[bold]] -> comp_m1 }
+        item { rolled[N], >[N, 3] => "Knock first." -=[asking] }
+    }
+    moment comp_m1 prompt -> comp_end {
+        item { choice[2], ~seen => "A detour." +=[seen] }
+    }
+}
 ```
 
-See `playwright_core/test/corpus/` for larger examples.
+See `test/corpus/` for larger examples.
 
 ---
 

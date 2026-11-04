@@ -29,6 +29,11 @@
 ;;   (require 'playwright-core-ts-mode)
 ;;
 ;; Then open any `.core` file.
+;;
+;; What it highlights is the whole of the `.core' language as
+;; `core/play/lib/grammar.mly' has it, including the `story { ... }' section
+;; and the `#line' directives `playc --compile' writes, and `!!fn[...]', the
+;; host-call shorthand for `!ffi["fn", ...]'.
 
 ;;; Code:
 
@@ -57,7 +62,15 @@
    :feature 'keyword
    '("rule" @font-lock-keyword-face
      "type" @font-lock-keyword-face
-     "extern" @font-lock-keyword-face)
+     "extern" @font-lock-keyword-face
+     ;; The story section's words: keywords only where they shape a story
+     ;; node, ordinary symbols anywhere else.
+     ["story" "moment" "prompt" "choice" "item" "encounter"]
+     @font-lock-keyword-face)
+
+   :language 'playwright_core
+   :feature 'preprocessor
+   '((line_directive) @font-lock-preprocessor-face)
 
    :language 'playwright_core
    :feature 'string
@@ -79,12 +92,20 @@
    '((true_guard)  @font-lock-constant-face
      (false_guard) @font-lock-constant-face
      (special)      @font-lock-builtin-face
-     (special_application head: (special) @font-lock-builtin-face))
+     (special_application head: (special) @font-lock-builtin-face)
+     ;; `!!fn[...]' is `!ffi["fn", ...]', so it is the special form it expands to.
+     (host_call name: (host_function) @font-lock-builtin-face))
 
    :language 'playwright_core
    :feature 'function
    '((rule_construct name: (symbol) @font-lock-function-name-face)
-     (application    head: (symbol) @font-lock-function-name-face))
+     (application    head: (symbol) @font-lock-function-name-face)
+     ;; A moment's label is where it is defined; where a moment goes next, an
+     ;; item's target and the moment an encounter enters are uses of one.
+     (story_moment    label:  (symbol) @font-lock-function-name-face)
+     (story_moment    next:   (symbol) @font-lock-function-call-face)
+     (story_item      target: (symbol) @font-lock-function-call-face)
+     (story_encounter entry:  (symbol) @font-lock-function-call-face))
 
    :language 'playwright_core
    :feature 'variable
@@ -103,7 +124,7 @@
      (cmp_guard operator: _ @font-lock-operator-face)
      (binary_expression operator: _ @font-lock-operator-face)
      (unary_expression  operator: _ @font-lock-operator-face)
-     ["=" "<>" "->" "+"] @font-lock-operator-face))
+     ["=" "<>" "->" "+" "=>" "+=" "-="] @font-lock-operator-face))
 
   "Tree-sitter font-lock rules for `playwright-core-ts-mode'.")
 
@@ -121,6 +142,12 @@
      ((node-is "}}") parent-bol 0)
      ;; Signature block contents
      ((parent-is "signature_block") parent-bol playwright_core-ts-indent-offset)
+     ;; The story section, its moments and their items, and an extern list
+     ((parent-is "story_section") parent-bol playwright_core-ts-indent-offset)
+     ((parent-is "story_moment") parent-bol playwright_core-ts-indent-offset)
+     ((parent-is "story_item") parent-bol playwright_core-ts-indent-offset)
+     ((parent-is "story_encounter") parent-bol playwright_core-ts-indent-offset)
+     ((parent-is "extern_declaration") parent-bol playwright_core-ts-indent-offset)
      ;; Default: keep at column 0
      (no-node parent-bol 0)))
   "Tree-sitter indentation rules for `playwright-core-ts-mode'.")
@@ -140,7 +167,7 @@ Syntax highlighting and basic indentation are provided via tree-sitter."
 
   (setq-local treesit-font-lock-settings playwright_core-ts--font-lock-rules)
   (setq-local treesit-font-lock-feature-list
-              '((comment keyword)
+              '((comment keyword preprocessor)
                 (string number type builtin)
                 (function variable constant operator)))
 
@@ -154,7 +181,7 @@ Syntax highlighting and basic indentation are provided via tree-sitter."
   (treesit-major-mode-setup))
 
 ;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.playwright_core\\'" . playwright-core-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.core\\'" . playwright-core-ts-mode))
 
 (provide 'playwright-core-ts-mode)
 ;;; playwright-core-ts-mode.el ends here

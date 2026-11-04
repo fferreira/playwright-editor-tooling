@@ -1,6 +1,7 @@
 /**
  * @file Tree-sitter grammar for Core Playwright, the `.core` IR
- * @see play/lib/grammar.mly — the authoritative grammar (source of truth)
+ * @see core/play/lib/grammar.mly and core/play/lib/lexer.mll — the
+ *      authoritative grammar (source of truth), in the playwright-core submodule
  * @license MIT
  */
 
@@ -20,6 +21,7 @@ module.exports = grammar({
     /\s/,
     $.line_comment,
     $.block_comment,
+    $.line_directive,
   ],
 
   // A closing ':' and an element-separating ':' are the same token, so at the
@@ -39,6 +41,7 @@ module.exports = grammar({
       $.rule_construct,
       $.fact,
       $.extern_declaration,
+      $.story_section,
     )),
 
     // ── Host-owned facts  extern { player_at[X, Y], ... }  ─────────────────
@@ -66,6 +69,70 @@ module.exports = grammar({
       $.term,
       repeat(seq(',', $.term)),
     ),
+
+    // ── The story section  story { moment … { item { … } } }  ─────────────────
+    //
+    // The state machine a .play is, written down: what `playc --compile` emits
+    // and what doc/core.md specifies. Moments and encounters interleave freely —
+    // the printer puts the encounters first, but grammar.mly does not hold a
+    // hand-written section to that, so neither does this.
+    //
+    // The six story words (`story`, `moment`, `prompt`, `choice`, `item`,
+    // `encounter`) are keywords only where they can start or shape one of these
+    // nodes. Everywhere else they are ordinary symbols, as grammar.mly's
+    // `symbol_name` re-admits them — `choice[2]` in an encounter's trigger is a
+    // term. The `word` token above is what gives that for free.
+    story_section: $ => seq(
+      'story',
+      '{',
+      repeat(choice($.story_moment, $.story_encounter)),
+      '}',
+    ),
+
+    // encounter entry { trigger guards }  — the guards are not optional here:
+    // an encounter with nothing to test would fire on every turn forever.
+    story_encounter: $ => seq(
+      'encounter',
+      field('entry', $.symbol),
+      '{',
+      $.guard,
+      repeat(seq(',', $.guard)),
+      '}',
+    ),
+
+    // moment label prompt|choice -> next { item … }
+    story_moment: $ => seq(
+      'moment',
+      field('label', $.symbol),
+      field('kind', $.moment_kind),
+      '->',
+      field('next', $.symbol),
+      '{',
+      repeat($.story_item),
+      '}',
+    ),
+
+    moment_kind: _ => choice('prompt', 'choice'),
+
+    // item { guards => "text" +=[…] -=[…] -> target }
+    //
+    // The guards are the rule-take notation and, unlike a rule's, may be empty:
+    // an item with none is simply always offerable. `+=`/`-=` rather than
+    // `+[…]`/`-[…]` because a minus after the text would read as subtraction.
+    story_item: $ => seq(
+      'item',
+      '{',
+      optional(seq($.guard, repeat(seq(',', $.guard)))),
+      '=>',
+      field('text', $.string),
+      optional(field('provide', $.provide_clause)),
+      optional(field('consume', $.consume_clause)),
+      optional(seq('->', field('target', $.symbol))),
+      '}',
+    ),
+
+    provide_clause: $ => seq('+=', '[', optional($.term_list), ']'),
+    consume_clause: $ => seq('-=', '[', optional($.term_list), ']'),
 
     // ── Type signatures  {{ ... }}  ─────────────────────────────────────────
     signature_block: $ => seq(
@@ -251,6 +318,7 @@ module.exports = grammar({
       $.string,
       $.number,
       $.special_application,  // must precede $.special
+      $.host_call,
       $.application,          // must precede $.symbol (both start with a symbol)
       $.special,
       $.variable,
@@ -307,6 +375,20 @@ module.exports = grammar({
       ']',
     ),
 
+    // !!fn[arg, ...]  or a bare  !!fn  — a host call.
+    //
+    // Sugar for !ffi["fn", arg, ...], resolved by both real parsers (grammar.mly
+    // and gam's term_parser.rs): the function's name becomes a *string*, the
+    // spelling that survives --strip-names. A bare !!fn is the call with no
+    // arguments, the same term as !!fn[] — unlike a bare !name, which is a
+    // symbol, because !! only ever means a call. Nothing past the parser can
+    // tell which was written, and the printer writes the expansion, so this
+    // node only ever appears in hand-written text.
+    host_call: $ => seq(
+      field('name', $.host_function),
+      optional(seq('[', optional($.term_list), ']')),
+    ),
+
     // ── Lexical tokens ──────────────────────────────────────────────────────
 
     // Atoms: start with lowercase letter
@@ -318,7 +400,15 @@ module.exports = grammar({
     // Host primitives: !lowercase...
     special: _ => /![a-z][a-zA-Z0-9_]*/,
 
-    // Non-negative integer literals; negation is handled by unary_expression
+    // The head of a host call, !!lowercase... — one token, so `!! roll` is not
+    // one, as `! read` is not a special form.
+    host_function: _ => /!![a-z][a-zA-Z0-9_]*/,
+
+    // The digits of an integer literal. The sign is not part of the token in
+    // either grammar: grammar.mly glues a minus written directly before the
+    // digits on *before* converting, which is what gives the whole signed range
+    // a literal (-9223372036854775808 included, to_review.md R68). Here that
+    // minus is a unary_expression, which is the same thing for a highlighter.
     number: _ => /\d+/,
 
     // Double-quoted string.  Modelled as a single atomic token so that comment-
@@ -330,9 +420,13 @@ module.exports = grammar({
     // nodes; if added later, the highlights / injections queries can be refined.
     //
     // Content rules:
-    //   \<any>  — backslash escape (\\, \", \n, \t, \{, …)
+    //   \<any>  — a backslash escape, of either of two layers. \" \n \r \t
+    //             belong to the quoted literal and are decoded by the lexer;
+    //             \\ \{ \} belong to the template underneath and are passed
+    //             through verbatim, for the template to read. One token accepts
+    //             both, which is right for highlighting.
     //   {Var}   — {var} interpolation template (any identifier)
-    //   rest    — any char except " and \
+    //   rest    — any char except " and \, newlines included
     string: _ => token(seq(
       '"',
       repeat(choice(
@@ -344,6 +438,12 @@ module.exports = grammar({
 
     // // line comment
     line_comment: _ => token(seq('//', /.*/)),
+
+    // #line N  or  #line N "file"  — where the following lines came from.
+    // playc --compile writes these by default (--no-line-directives turns them
+    // off) so that a generated program's diagnostics come back in the .play's
+    // coordinates. An extra, because one may stand between any two tokens.
+    line_directive: _ => token(seq('#line', /[ \t]+[0-9]+/, /[^\n]*/)),
 
     // /- ... -/  and  /* ... */  block comments (non-nested approximation).
     // These regexes avoid lookahead (not supported by tree-sitter's regex engine):

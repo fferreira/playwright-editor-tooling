@@ -700,3 +700,198 @@ extern is still a term
 
 (program
   (fact (term_list (term (application head: (symbol) (term_list (term (number))))))))
+
+==========================
+Nested sequence (parenthesised, as the printer writes it)
+==========================
+
++[fill[:(:a:b:):c:]]
+
+---
+
+(program
+  (fact
+    (term_list
+      (term (application head: (symbol)
+        (term_list
+          (term (list (non_empty_list
+            (term (list (non_empty_list (term (symbol)) (term (symbol)))))
+            (term (symbol)))))))))))
+
+==========================
+Host call: !!fn[...] and a bare !!fn
+==========================
+
+rule ask { asking ==> answer[!!roll[6]], now[!!clock], none[!!clock[]] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term (application head: (symbol)
+          (term_list (term (host_call name: (host_function) (term_list (term (number))))))))
+        (term (application head: (symbol)
+          (term_list (term (host_call name: (host_function))))))
+        (term (application head: (symbol)
+          (term_list (term (host_call name: (host_function))))))))))
+
+==========================
+Host call inside arithmetic, a list and another call
+==========================
+
+rule mix { go ==> n[!!roll[6] + 1], l[:!!a:!!b:], w[!!peek[!facts[]]] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term (application head: (symbol)
+          (term_list (term (binary_expression
+            left: (host_call name: (host_function) (term_list (term (number))))
+            right: (number))))))
+        (term (application head: (symbol)
+          (term_list (term (list (non_empty_list
+            (term (host_call name: (host_function)))
+            (term (host_call name: (host_function)))))))))
+        (term (application head: (symbol)
+          (term_list (term (host_call name: (host_function)
+            (term_list (term (special_application head: (special)))))))))))))
+
+==========================
+Story section: moments, items and their clauses
+==========================
+
+story {
+  moment comp_m0 prompt -> comp_m1 {
+    item { => "You wake." +=[asking] }
+  }
+  moment comp_m1 choice -> comp_end {
+    item { crank["out"], ~dark => "Open it." +=[player[bold]] -=[asking] -> comp_m0 }
+    item { => "Knock first." }
+  }
+}
+
+---
+
+(program
+  (story_section
+    (story_moment
+      label: (symbol)
+      kind: (moment_kind)
+      next: (symbol)
+      (story_item
+        text: (string)
+        provide: (provide_clause (term_list (term (symbol))))))
+    (story_moment
+      label: (symbol)
+      kind: (moment_kind)
+      next: (symbol)
+      (story_item
+        (guard (pos_guard (term (application head: (symbol) (term_list (term (string)))))))
+        (guard (neg_guard term: (term (symbol))))
+        text: (string)
+        provide: (provide_clause
+          (term_list (term (application head: (symbol) (term_list (term (symbol)))))))
+        consume: (consume_clause (term_list (term (symbol))))
+        target: (symbol))
+      (story_item
+        text: (string)))))
+
+==========================
+Story section: an encounter, whose trigger uses a story word as a term
+==========================
+
+story {
+  encounter comp_m1 { choice[2], ~encounter_done }
+  moment comp_m1 prompt -> comp_end {
+    item { => "A detour." -> comp_end }
+  }
+}
+
+---
+
+(program
+  (story_section
+    (story_encounter
+      entry: (symbol)
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (number)))))))
+      (guard (neg_guard term: (term (symbol)))))
+    (story_moment
+      label: (symbol)
+      kind: (moment_kind)
+      next: (symbol)
+      (story_item
+        text: (string)
+        target: (symbol)))))
+
+==========================
+Story words are still symbols outside a story section
+==========================
+
++[story, moment[1], prompt, choice[2], item, encounter]
+rule item { moment[X] ==> prompt[X] }
+
+---
+
+(program
+  (fact
+    (term_list
+      (term (symbol))
+      (term (application head: (symbol) (term_list (term (number)))))
+      (term (symbol))
+      (term (application head: (symbol) (term_list (term (number)))))
+      (term (symbol))
+      (term (symbol))))
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (variable)))))))
+      (rule_arrow)
+      (term_list (term (application head: (symbol) (term_list (term (variable)))))))))
+
+==========================
+Line directives, as playc --compile writes them
+==========================
+
+#line 40 "story/game.play"
+rule ask_crank { asking_crank ==> crank[!ffi["crank"]] }
+story {
+#line 43 "story/game.play"
+  moment comp_m0 prompt -> comp_end {
+#line 43
+    item { => "Hi." }
+  }
+}
+
+---
+
+(program
+  (line_directive)
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (symbol))))
+      (rule_arrow)
+      (term_list
+        (term (application head: (symbol)
+          (term_list (term (special_application head: (special)
+            (term_list (term (string)))))))))))
+  (story_section
+    (line_directive)
+    (story_moment
+      label: (symbol)
+      kind: (moment_kind)
+      next: (symbol)
+      (line_directive)
+      (story_item
+        text: (string)))))

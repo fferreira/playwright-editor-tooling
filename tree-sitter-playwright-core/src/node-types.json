@@ -55,6 +55,10 @@
             "named": true
           },
           {
+            "type": "host_call",
+            "named": true
+          },
+          {
             "type": "list",
             "named": true
           },
@@ -136,6 +140,10 @@
           },
           {
             "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "host_call",
             "named": true
           },
           {
@@ -253,6 +261,21 @@
     }
   },
   {
+    "type": "consume_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "term_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "diff_guard",
     "named": true,
     "fields": {
@@ -357,6 +380,32 @@
     }
   },
   {
+    "type": "host_call",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "host_function",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "term_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "keep_guard",
     "named": true,
     "fields": {
@@ -404,6 +453,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "moment_kind",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "neg_guard",
@@ -488,6 +542,25 @@
         },
         {
           "type": "signature_block",
+          "named": true
+        },
+        {
+          "type": "story_section",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "provide_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "term_list",
           "named": true
         }
       ]
@@ -687,6 +760,153 @@
     }
   },
   {
+    "type": "story_encounter",
+    "named": true,
+    "fields": {
+      "entry": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "symbol",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "guard",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "story_item",
+    "named": true,
+    "fields": {
+      "consume": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "consume_clause",
+            "named": true
+          }
+        ]
+      },
+      "provide": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "provide_clause",
+            "named": true
+          }
+        ]
+      },
+      "target": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "symbol",
+            "named": true
+          }
+        ]
+      },
+      "text": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "guard",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "story_moment",
+    "named": true,
+    "fields": {
+      "kind": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "moment_kind",
+            "named": true
+          }
+        ]
+      },
+      "label": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "symbol",
+            "named": true
+          }
+        ]
+      },
+      "next": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "symbol",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "story_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "story_section",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "story_encounter",
+          "named": true
+        },
+        {
+          "type": "story_moment",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "term",
     "named": true,
     "fields": {},
@@ -700,6 +920,10 @@
         },
         {
           "type": "binary_expression",
+          "named": true
+        },
+        {
+          "type": "host_call",
           "named": true
         },
         {
@@ -839,6 +1063,10 @@
             "named": true
           },
           {
+            "type": "host_call",
+            "named": true
+          },
+          {
             "type": "list",
             "named": true
           },
@@ -909,11 +1137,19 @@
     "named": false
   },
   {
+    "type": "+=",
+    "named": false
+  },
+  {
     "type": ",",
     "named": false
   },
   {
     "type": "-",
+    "named": false
+  },
+  {
+    "type": "-=",
     "named": false
   },
   {
@@ -957,6 +1193,10 @@
     "named": false
   },
   {
+    "type": "=>",
+    "named": false
+  },
+  {
     "type": ">",
     "named": false
   },
@@ -986,6 +1226,14 @@
     "extra": true
   },
   {
+    "type": "choice",
+    "named": false
+  },
+  {
+    "type": "encounter",
+    "named": false
+  },
+  {
     "type": "extern",
     "named": false
   },
@@ -994,9 +1242,26 @@
     "named": true
   },
   {
+    "type": "host_function",
+    "named": true
+  },
+  {
+    "type": "item",
+    "named": false
+  },
+  {
     "type": "line_comment",
     "named": true,
     "extra": true
+  },
+  {
+    "type": "line_directive",
+    "named": true,
+    "extra": true
+  },
+  {
+    "type": "moment",
+    "named": false
   },
   {
     "type": "number",
@@ -1005,6 +1270,10 @@
   {
     "type": "number",
     "named": true
+  },
+  {
+    "type": "prompt",
+    "named": false
   },
   {
     "type": "rule",
@@ -1013,6 +1282,10 @@
   {
     "type": "special",
     "named": true
+  },
+  {
+    "type": "story",
+    "named": false
   },
   {
     "type": "string",

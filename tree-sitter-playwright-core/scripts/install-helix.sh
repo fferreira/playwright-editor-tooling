@@ -29,7 +29,7 @@ $MARKER_START
 [[language]]
 name = "playwright_core"
 scope = "source.playwright-core"
-file-types = ["playwright_core"]
+file-types = ["core"]
 grammar = "playwright_core"
 comment-token = "//"
 indent = { tab-width = 4, unit = "    " }

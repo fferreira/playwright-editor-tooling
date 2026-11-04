@@ -1,10 +1,25 @@
-; GED language highlights for tree-sitter
-; Compatible with Helix editor capture names.
+; Core Playwright (.core) highlights for tree-sitter.
+; Compatible with Helix editor capture names. Earlier patterns win, so the
+; specific captures come before the generic ones they would otherwise lose to.
 
 ; ── Keywords ────────────────────────────────────────────────────────────────
 "rule" @keyword
 "type" @keyword
 "extern" @keyword
+
+; The story section's words. Each is a keyword only where it shapes a story
+; node; anywhere else the grammar lexes it as an ordinary (symbol).
+[
+  "story"
+  "moment"
+  "prompt"
+  "choice"
+  "item"
+  "encounter"
+] @keyword
+
+; `#line N "file"`, which playc --compile writes by default.
+(line_directive) @keyword.directive
 
 ; ── Rule and function names ─────────────────────────────────────────────────
 ; Rule names come first so they win over the generic @constant below.
@@ -12,6 +27,16 @@
 (application    head: (symbol) @function)
 (special_application head: (special) @function.builtin)
 (special) @function.builtin
+; `!!fn[…]` is `!ffi["fn", …]`, so it is coloured as the special form it is.
+(host_call name: (host_function) @function.builtin)
+
+; ── Story labels ─────────────────────────────────────────────────────────────
+; A moment's own label, where it goes next, an item's target, and the moment
+; an encounter enters: all names of moments, so all one colour.
+(story_moment    label:  (symbol) @label)
+(story_moment    next:   (symbol) @label)
+(story_item      target: (symbol) @label)
+(story_encounter entry:  (symbol) @label)
 
 ; ── Variables ────────────────────────────────────────────────────────────────
 (variable) @variable
@@ -47,6 +72,9 @@
   "<>"
   "->"
   "+"
+  "=>"
+  "+="
+  "-="
 ] @operator
 
 ; ── Guard constants ──────────────────────────────────────────────────────────
