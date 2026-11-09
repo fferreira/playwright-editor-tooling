@@ -10,6 +10,7 @@ everything here follows them.
 |---|---|
 | `vscode-playwright/` | A VS Code extension for `.play` stories: highlighting, the compiler's errors and warnings as you type, and **Compile to .nisus**. The compiler is playc-web, core's own compiler built to WebAssembly, shipped inside the extension. See its [README](vscode-playwright/README.md). |
 | `tree-sitter-playwright-core/` | A tree-sitter grammar for the `.core` IR, with highlight and indent queries, an Emacs 29+ major mode, and install scripts for Helix and Emacs. See its [README](tree-sitter-playwright-core/README.md). |
+| `build_vsix.sh` | Builds the VS Code extension, `vscode-playwright-<version>.vsix`. |
 | `tools/core_dir.sh` | Where the tools here find playwright-core. |
 
 **Two languages, two technologies.** VS Code highlights with TextMate
@@ -18,6 +19,19 @@ grammars, and Helix and Emacs with tree-sitter, so `.play` has a TextMate gramma
 parser. Both follow core's lexers, and both are tested against every file of
 their language that core ships. The browser IDE has a third highlighter, a
 CodeMirror mode, in the playwright repository.
+
+## Building the VS Code extension
+
+```sh
+./build_vsix.sh                 # vscode-playwright/vscode-playwright-<version>.vsix
+./build_vsix.sh <dir | file>    # or there
+code --install-extension vscode-playwright/vscode-playwright-0.1.0.vsix
+```
+
+It installs the extension's dev tools if they're missing or stale. It then
+packages, which builds playc-web from playwright-core first, so it needs core,
+dune, `wasm_of_ocaml` and binaryen. It builds and doesn't test; `./check.sh
+vscode` is the gate, and its packaging step runs this script.
 
 ## Checking it
 

@@ -70,12 +70,18 @@ the way the rest of the repository does: `$CORE_DIR`, then `../core` (inside a
 playwright checkout), then `../playwright-core`.
 
 ```sh
+../build_vsix.sh       # vscode-playwright-<version>.vsix, dev tools and compiler included
+code --install-extension vscode-playwright-0.1.0.vsix
+```
+
+Or step by step:
+
+```sh
 npm ci
 npm run build          # stage the compiler
 npm test               # unit tests, in node, against the real compiler
 npm run test:syntax    # the highlighting grammar
 npm run package        # vscode-playwright-<version>.vsix
-code --install-extension vscode-playwright-0.1.0.vsix
 ```
 
 `npm run test:integration` runs the extension inside an installed VS Code or

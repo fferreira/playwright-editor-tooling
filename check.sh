@@ -19,7 +19,7 @@
 #                            region left open
 #               compiler     build.sh: playc-web built from playwright-core and staged
 #               unit         node --test: src/ against the real compiler
-#               package      vsce package, and the .vsix holds what it should
+#               package      build_vsix.sh, and the .vsix holds what it should
 #               integration  the packaged .vsix driven inside VS Code or VSCodium.
 #                            Off by default, because it opens a window:
 #                            VSCODE_TEST=1 ./check.sh vscode
@@ -164,9 +164,11 @@ if want vscode; then
 		echo
 
 		if [ "$HAVE_NODE_MODULES" = 1 ]; then
-			echo "==> vscode/package: vsce package"
+			# The script an author runs, not a copy of its steps, so the gate
+			# checks the .vsix people actually build.
+			echo "==> vscode/package: build_vsix.sh"
 			out="$(mktemp -d)"
-			(cd "$VSCODE" && npx --no-install vsce package --no-dependencies -o "$out/" >/dev/null)
+			"$ROOT/build_vsix.sh" "$out" >/dev/null
 			vsix="$(ls "$out"/*.vsix)"
 			listing="$(unzip -l "$vsix")"
 			for expect in extension/extension.js extension/compiler/playc_web.js \
