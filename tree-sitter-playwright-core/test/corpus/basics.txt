@@ -895,3 +895,26 @@ story {
       (line_directive)
       (story_item
         text: (string)))))
+
+==========================
+Host function signatures
+==========================
+
+{{
+  !!roll : number -> number
+  !!clock : string
+  !!log : string -> ? -> number
+  die : type
+}}
+
+---
+
+(program
+  (signature_block
+    (signature_item (host_signature name: (host_function)
+      (type_expr (base_type) (base_type))))
+    (signature_item (host_signature name: (host_function)
+      (type_expr (base_type))))
+    (signature_item (host_signature name: (host_function)
+      (type_expr (base_type) (any_type) (base_type))))
+    (signature_item (type_declaration name: (symbol)))))

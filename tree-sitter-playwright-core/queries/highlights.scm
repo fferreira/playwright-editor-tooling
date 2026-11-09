@@ -27,8 +27,9 @@
 (application    head: (symbol) @function)
 (special_application head: (special) @function.builtin)
 (special) @function.builtin
-; `!!fn[…]` is `!ffi["fn", …]`, so it is coloured as the special form it is.
-(host_call name: (host_function) @function.builtin)
+; `!!fn[…]` is `!ffi["fn", …]`, so it is coloured as the special form it is —
+; in a call, and where `{{ !!fn : … }}` declares its type.
+(host_function) @function.builtin
 
 ; ── Story labels ─────────────────────────────────────────────────────────────
 ; A moment's own label, where it goes next, an item's target, and the moment

@@ -11,11 +11,13 @@ everything here follows them.
 | `tree-sitter-playwright-core/` | A tree-sitter grammar for the `.core` IR, with highlight and indent queries, an Emacs 29+ major mode, and install scripts for Helix and Emacs. See its [README](tree-sitter-playwright-core/README.md). |
 
 The `.play` source language has no grammar here. Its editor is the browser
-IDE, in the playwright repository.
+IDE, in the [playwright](https://github.com/fferreira/playwright) repository.
 
 ## Checking it
 
 ```sh
+git clone https://github.com/fferreira/playwright-editor-tooling.git
+cd playwright-editor-tooling
 ./check.sh
 ```
 

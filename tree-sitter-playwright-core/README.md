@@ -25,11 +25,15 @@ parses without an error, as does everything `playc --compile` writes for core's
   `!ffi["fn", a, b]` (`host_call`). Both real parsers expand it before anything
   else sees it, and the printer writes the expansion, so it only ever appears
   in hand-written text — which is exactly the text an editor is for.
+- **`{{ !!fn : number -> number }}`**, the signature that types a host
+  function (`host_signature`), spelled the way the call is.
 
-Two things are approximations, both harmless to a highlighter: block comments
-do not nest here (the real lexer nests them), and a string is one token, so
-`{Var}` interpolations inside it are not separate nodes (an external scanner
-would be needed — see the comment in `grammar.js`).
+Three things are approximations, all harmless to a highlighter: block comments
+do not nest here (the real lexer nests them); a string is one token, so `{Var}`
+interpolations inside it are not separate nodes (an external scanner would be
+needed — see the comment in `grammar.js`); and `type` is a keyword only where a
+declaration expects it, so elsewhere in a type it reads as a type constructor —
+`f : number -> type` and `!!fn : type` parse here and are syntax errors to core.
 
 Keeping it in step with core is a manual job: when core's grammar moves, run
 `../check.sh` against the new core — it parses core's corpus with this grammar
@@ -82,7 +86,7 @@ cd tree-sitter-playwright-core
 tree-sitter test
 ```
 
-All 45 test cases in `test/corpus/basics.txt` should pass.
+All 46 test cases in `test/corpus/basics.txt` should pass.
 
 ### Parsing core's own corpus
 
@@ -178,7 +182,7 @@ cd tree-sitter-playwright-core
 The script:
 
 1. Compiles `src/parser.c` into a shared library
-   (`libtree-sitter-playwright-core.dylib` on macOS, `.so` on Linux) and installs it into
+   (`libtree-sitter-playwright_core.dylib` on macOS, `.so` on Linux) and installs it into
    `~/.emacs.d/tree-sitter/` (where Emacs looks for grammars by default).
 2. Copies `editors/playwright-core-ts-mode.el` to `~/.emacs.d/lisp/`.
 3. Appends a guarded block (idempotent) to `~/.emacs.d/init.el`:
@@ -188,6 +192,12 @@ The script:
    ```
 
 Restart Emacs and open any `.core` file — `playwright-core-ts-mode` activates automatically.
+
+Versions before this one installed the library as
+`libtree-sitter-playwright-core`, with a hyphen. Emacs derives the file name
+from the language, `playwright_core`, so it never loaded that one, and
+`treesit-language-available-p` answered `nil`. Running the script again
+installs the right name and deletes the old file.
 
 ### Verify in Emacs
 
@@ -205,7 +215,7 @@ If you prefer not to run the script:
 ```sh
 # 1. Compile the shared library
 cc -shared -fPIC \
-   -o ~/.emacs.d/tree-sitter/libtree-sitter-playwright-core.dylib \
+   -o ~/.emacs.d/tree-sitter/libtree-sitter-playwright_core.dylib \
    -I src \
    src/parser.c
 
@@ -253,6 +263,7 @@ rule {
 extern { player_at[X, Y] }
 
 // Ask the host: !!roll[6] is !ffi["roll", 6], and a bare !!clock is !ffi["clock"]
+{{ !!roll : number -> number  !!clock : string }}
 rule ask { asking ==> rolled[!!roll[6]], now[!!clock] }
 
 // The story section, as playc --compile writes it

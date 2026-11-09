@@ -84,4 +84,4 @@ else
 fi
 
 echo ""
-echo "Done.  Open any `.core` file in Helix to see syntax highlighting."
+echo "Done.  Open any '.core' file in Helix to see syntax highlighting."

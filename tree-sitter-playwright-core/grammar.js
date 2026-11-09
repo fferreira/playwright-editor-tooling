@@ -144,6 +144,7 @@ module.exports = grammar({
     signature_item: $ => choice(
       $.type_declaration,
       $.constructor_signature,
+      $.host_signature,
     ),
 
     // name : type
@@ -156,6 +157,16 @@ module.exports = grammar({
     // name : type_expr
     constructor_signature: $ => seq(
       field('name', $.symbol),
+      ':',
+      $.type_expr,
+    ),
+
+    // !!fn : type_expr — the type of the host function a !!fn[...] call
+    // reaches, spelled the way the call is (grammar.mly's `FFI COLON
+    // type_expr`, Syntax.FfiSignature). No `: type` alternative: a host
+    // function is not a type, and the real grammar has no such production.
+    host_signature: $ => seq(
+      field('name', $.host_function),
       ':',
       $.type_expr,
     ),

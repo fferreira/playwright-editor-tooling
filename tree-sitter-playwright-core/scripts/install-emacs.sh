@@ -17,7 +17,13 @@ case "$(uname -s)" in
     *)      SOEXT="so"    ;;
 esac
 
-LIB_NAME="libtree-sitter-playwright-core.$SOEXT"
+# Emacs derives the file it loads from the *language* name, `playwright_core`,
+# so the underscore is not a typo: libtree-sitter-playwright_core. A hyphen
+# here installs a library Emacs never looks for, and treesit then reports the
+# language unavailable with nothing pointing at the name.
+LIB_NAME="libtree-sitter-playwright_core.$SOEXT"
+# What earlier versions of this script installed, under the name Emacs ignores.
+OLD_LIB_NAME="libtree-sitter-playwright-core.$SOEXT"
 
 # Emacs looks for tree-sitter grammars in `treesit-extra-load-path` or the
 # default directory ~/.emacs.d/tree-sitter/.  We install into the latter.
@@ -45,6 +51,10 @@ cc \
     -I "$CRATE_DIR/src" \
     "$PARSER_C"
 echo "Installed: $LIB_OUT"
+if [ -f "$TREESIT_DIR/$OLD_LIB_NAME" ]; then
+    rm -f "$TREESIT_DIR/$OLD_LIB_NAME"
+    echo "Removed:   $TREESIT_DIR/$OLD_LIB_NAME (the old, misnamed copy)"
+fi
 
 # ── Install playwright-core-ts-mode.el ────────────────────────────────────────────────────
 EL_DST="$LISP_DIR/playwright-core-ts-mode.el"

@@ -464,6 +464,10 @@
         {
           "type": "SYMBOL",
           "name": "constructor_signature"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "host_signature"
         }
       ]
     },
@@ -497,6 +501,27 @@
           "content": {
             "type": "SYMBOL",
             "name": "symbol"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ":"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type_expr"
+        }
+      ]
+    },
+    "host_signature": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "host_function"
           }
         },
         {

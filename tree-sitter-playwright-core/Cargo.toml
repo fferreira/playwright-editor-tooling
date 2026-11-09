@@ -4,6 +4,7 @@ description = "Core Playwright grammar for tree-sitter"
 version = "0.1.0"
 authors = ["Francisco Ferreira"]
 license = "MIT"
+repository = "https://github.com/fferreira/playwright-editor-tooling"
 readme = "README.md"
 keywords = ["incremental", "parsing", "tree-sitter", "playwright_core", "playwright"]
 categories = ["parser-implementations", "parsing", "text-editors"]

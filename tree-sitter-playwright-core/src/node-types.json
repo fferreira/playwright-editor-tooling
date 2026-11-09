@@ -406,6 +406,32 @@
     }
   },
   {
+    "type": "host_signature",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "host_function",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type_expr",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "keep_guard",
     "named": true,
     "fields": {
@@ -698,6 +724,10 @@
       "types": [
         {
           "type": "constructor_signature",
+          "named": true
+        },
+        {
+          "type": "host_signature",
           "named": true
         },
         {

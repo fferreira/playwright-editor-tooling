@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "description": "Core Playwright grammar for tree-sitter",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fferreira/playwright-editor-tooling.git",
+    "directory": "tree-sitter-playwright-core"
+  },
   "main": "bindings/node",
   "scripts": {
     "generate": "tree-sitter generate",

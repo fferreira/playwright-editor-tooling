@@ -4,7 +4,7 @@
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: languages, tree-sitter, playwright_core
-;; URL: https://github.com/fferreira/playwright
+;; URL: https://github.com/fferreira/playwright-editor-tooling
 
 ;;; Commentary:
 
@@ -14,7 +14,7 @@
 ;; Prerequisites
 ;; -------------
 ;; 1. Emacs 29+ built with tree-sitter support (`--with-tree-sitter`).
-;; 2. The compiled shared library `libtree-sitter-playwright-core.{so,dylib}` must be in
+;; 2. The compiled shared library `libtree-sitter-playwright_core.{so,dylib}` must be in
 ;;    `treesit-extra-load-path` or `~/.emacs.d/tree-sitter/`.
 ;;
 ;; The `install-emacs.sh` script in the parent `scripts/` directory compiles
@@ -93,8 +93,9 @@
      (false_guard) @font-lock-constant-face
      (special)      @font-lock-builtin-face
      (special_application head: (special) @font-lock-builtin-face)
-     ;; `!!fn[...]' is `!ffi["fn", ...]', so it is the special form it expands to.
-     (host_call name: (host_function) @font-lock-builtin-face))
+     ;; `!!fn[...]' is `!ffi["fn", ...]', so it is the special form it expands
+     ;; to -- in a call, and where `{{ !!fn : ... }}' declares its type.
+     (host_function) @font-lock-builtin-face)
 
    :language 'playwright_core
    :feature 'function
