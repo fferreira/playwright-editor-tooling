@@ -1,0 +1,65 @@
+// SYNTAX TEST "source.playwright" "moments, labels, jumps and prose"
+
+// Prose is whatever lies between the constructs, so it carries no scope of
+// its own; these assert what each construct is and that prose stays plain.
+
+@start -> The story begins, {Name}.
+// <------ entity.name.tag.label.playwright
+//     ^^ keyword.control.prompt.playwright
+//        ^^^^^^^^^^^^^^^^ source.playwright - meta.guard.playwright meta.provide.playwright meta.consume.playwright meta.block.core.playwright meta.block.types.playwright meta.verbatim.playwright meta.interpolation.playwright comment.line.double-slash.playwright comment.block.playwright entity.name.tag.label.playwright entity.name.function.playwright constant.other.symbol.playwright variable.other.playwright string.quoted.double.playwright keyword.control.prompt.playwright keyword.control.choice.playwright
+//                          ^ punctuation.definition.interpolation.begin.playwright
+//                           ^^^^ meta.interpolation.playwright variable.other.playwright
+//                               ^ punctuation.definition.interpolation.end.playwright
+=> Take the shortcut [-> ending] +=[took[shortcut]]
+// <-- keyword.control.choice.playwright
+// ^^^^^^^^^^^^^^^^^ source.playwright - meta.guard.playwright meta.provide.playwright meta.consume.playwright meta.block.core.playwright meta.block.types.playwright meta.verbatim.playwright meta.interpolation.playwright comment.line.double-slash.playwright comment.block.playwright entity.name.tag.label.playwright entity.name.function.playwright constant.other.symbol.playwright variable.other.playwright string.quoted.double.playwright keyword.control.prompt.playwright keyword.control.choice.playwright
+//                   ^^^ keyword.control.jump.playwright
+//                       ^^^^^^ entity.name.tag.label.playwright
+//                               ^^^ keyword.operator.provide.playwright
+//                                  ^^^^ meta.provide.playwright entity.name.function.playwright
+//                                       ^^^^^^^^ meta.provide.playwright constant.other.symbol.playwright
+//                                               ^^ meta.provide.playwright punctuation.section.brackets.end.playwright
+?[key] => Unlock the door -=[key] [-> hall]
+// <-- meta.guard.playwright keyword.control.guard.playwright
+//^^^ meta.guard.playwright constant.other.symbol.playwright
+//        ^^^^^^^^^^^^^^^ source.playwright - meta.guard.playwright meta.provide.playwright meta.consume.playwright meta.block.core.playwright meta.block.types.playwright meta.verbatim.playwright meta.interpolation.playwright comment.line.double-slash.playwright comment.block.playwright entity.name.tag.label.playwright entity.name.function.playwright constant.other.symbol.playwright variable.other.playwright string.quoted.double.playwright keyword.control.prompt.playwright keyword.control.choice.playwright
+//                        ^^^ keyword.operator.consume.playwright
+//                           ^^^ meta.consume.playwright constant.other.symbol.playwright
+
+// The ] that closes an application does not close the guard around it.
+@hall ?[at[kitchen], ~lantern, level[N], >=[N, 3]] -> Level {N}.
+//      ^^ meta.guard.playwright meta.application.playwright entity.name.function.playwright
+//                   ^ meta.guard.playwright keyword.operator.logical.negation.playwright
+//                    ^^^^^^^ meta.guard.playwright constant.other.symbol.playwright
+//                                   ^ meta.guard.playwright variable.other.playwright
+//                                       ^^ meta.guard.playwright keyword.operator.comparison.playwright
+//                                             ^ meta.guard.playwright constant.numeric.integer.playwright
+//                                                    ^^^^^ source.playwright - meta.guard.playwright meta.provide.playwright meta.consume.playwright meta.block.core.playwright meta.block.types.playwright meta.verbatim.playwright meta.interpolation.playwright comment.line.double-slash.playwright comment.block.playwright entity.name.tag.label.playwright entity.name.function.playwright constant.other.symbol.playwright variable.other.playwright string.quoted.double.playwright keyword.control.prompt.playwright keyword.control.choice.playwright
+
+// The Unicode spellings are the same tokens.
+→ Onwards. ⇒ Or this.
+// <- keyword.control.prompt.playwright
+//         ^ keyword.control.choice.playwright
+
+// An @ or a // ends a run of prose, as the real lexer has it.
+-> See http://example.org for more.
+// ^^^^^^^^^ source.playwright - meta.guard.playwright meta.provide.playwright meta.consume.playwright meta.block.core.playwright meta.block.types.playwright meta.verbatim.playwright meta.interpolation.playwright comment.line.double-slash.playwright comment.block.playwright entity.name.tag.label.playwright entity.name.function.playwright constant.other.symbol.playwright variable.other.playwright string.quoted.double.playwright keyword.control.prompt.playwright keyword.control.choice.playwright
+//          ^^ comment.line.double-slash.playwright punctuation.definition.comment.playwright
+//            ^^^^^^^^^^^ comment.line.double-slash.playwright
+-> {Like this} is literal text.
+// ^^^^^^^^^^^ source.playwright - meta.guard.playwright meta.provide.playwright meta.consume.playwright meta.block.core.playwright meta.block.types.playwright meta.verbatim.playwright meta.interpolation.playwright comment.line.double-slash.playwright comment.block.playwright entity.name.tag.label.playwright entity.name.function.playwright constant.other.symbol.playwright variable.other.playwright string.quoted.double.playwright keyword.control.prompt.playwright keyword.control.choice.playwright
+
+// Prompt prose may be delimited, with \}} for a literal closing pair.
+-> {{A lone } brace, a \}} pair, and {Name}.}}
+// <-- keyword.control.prompt.playwright
+// ^^ punctuation.definition.verbatim.begin.playwright
+//   ^^^^^^^^^^^^^^ meta.verbatim.playwright - punctuation.definition.verbatim.end.playwright
+//                     ^^^ meta.verbatim.playwright constant.character.escape.playwright
+//                                    ^^^^ meta.verbatim.playwright variable.other.playwright
+//                                          ^^ punctuation.definition.verbatim.end.playwright
+
+/- A block comment,
+   which /- may nest -/ like that.
+-/ -> After it.
+// <-- comment.block.playwright punctuation.definition.comment.end.playwright
+// ^^ keyword.control.prompt.playwright

@@ -1,0 +1,8 @@
+<<
++[coin]
+>>
+-> A coin lies on the floor.
+=> Pick it up [-> rich] -=[coin]
+=> Leave it [-> poor]
+@rich -> You have a coin.
+@poor -> You have nothing.

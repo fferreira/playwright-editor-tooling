@@ -1,0 +1,4 @@
+node_modules/
+# Staged by build.sh from playwright-core.
+compiler/
+*.vsix

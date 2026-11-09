@@ -1,0 +1,18 @@
+// SYNTAX TEST "source.playwright" "encounters and returns"
+
+@@[ ?[storm[N], ~weathered]
+// <--- keyword.control.encounter.begin.playwright
+//  ^^ meta.guard.playwright keyword.control.guard.playwright
+//    ^^^^^ meta.guard.playwright entity.name.function.playwright
+//               ^^^^^^^^^ meta.guard.playwright constant.other.symbol.playwright
+-> A squall: force {N}.
+//                  ^ variable.other.playwright
+=> Back away slowly [<-] -=[wolf]
+//                  ^ punctuation.section.brackets.begin.playwright
+//                   ^^ keyword.control.return.playwright
+//                       ^^^ keyword.operator.consume.playwright
+<- +=[weathered]
+// <-- keyword.control.return.playwright
+// ^^^ keyword.operator.provide.playwright
+] @@
+// <---- keyword.control.encounter.end.playwright

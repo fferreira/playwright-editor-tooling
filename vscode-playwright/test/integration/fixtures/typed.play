@@ -1,0 +1,8 @@
+{{
+  thing : type
+  f : number -> thing
+}}
+<<
++[f["not a number"]]
+>>
+-> Hi

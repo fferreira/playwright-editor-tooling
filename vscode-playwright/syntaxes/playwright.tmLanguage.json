@@ -1,0 +1,560 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Playwright",
+  "scopeName": "source.playwright",
+  "comment": "The .play language. Prose is deliberately not a region: the real lexer (core's playc/lib/play_lexer.mll) ends a run of prose at any of its moment_start openers or a blank line, so prose is whatever lies between the constructs below, and those are matched wherever they occur. Terms inside ?[...], +=[...], -=[...] and <<...>> are core, coloured as the tree-sitter grammar colours .core files.",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#meta-block"
+    },
+    {
+      "include": "#encounter"
+    },
+    {
+      "include": "#verbatim-prompt"
+    },
+    {
+      "include": "#type-block"
+    },
+    {
+      "include": "#guard"
+    },
+    {
+      "include": "#provide"
+    },
+    {
+      "include": "#consume"
+    },
+    {
+      "include": "#return-target"
+    },
+    {
+      "include": "#jump-target"
+    },
+    {
+      "include": "#arrows"
+    },
+    {
+      "include": "#label"
+    },
+    {
+      "include": "#interpolation"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.playwright",
+          "match": "(//).*$",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.comment.playwright"
+            }
+          }
+        },
+        {
+          "include": "#block-comment"
+        }
+      ]
+    },
+    "block-comment": {
+      "comment": "/- ... -/, and they nest.",
+      "name": "comment.block.playwright",
+      "begin": "/-",
+      "end": "-/",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.begin.playwright"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.end.playwright"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#block-comment"
+        }
+      ]
+    },
+    "core-comments": {
+      "comment": "Core's lexer also takes /* ... */, nested, inside a <<...>> block or a clause.",
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "name": "comment.block.playwright",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.begin.playwright"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.end.playwright"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#core-comments"
+            }
+          ]
+        }
+      ]
+    },
+    "meta-block": {
+      "name": "meta.block.core.playwright",
+      "begin": "<<",
+      "end": ">>",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.section.block.begin.playwright"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.block.end.playwright"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#core-program"
+        }
+      ]
+    },
+    "core-program": {
+      "patterns": [
+        {
+          "include": "#core-comments"
+        },
+        {
+          "include": "#type-block"
+        },
+        {
+          "comment": "rule name { ... }, or an anonymous rule { ... }; rule[...] is a term.",
+          "match": "\\b(rule)\\b(?!\\s*\\[)(?:\\s+([a-z][A-Za-z0-9_]*))?",
+          "captures": {
+            "1": {
+              "name": "keyword.other.rule.playwright"
+            },
+            "2": {
+              "name": "entity.name.function.rule.playwright"
+            }
+          }
+        },
+        {
+          "match": "\\b(extern)\\b(?=\\s*\\{)",
+          "captures": {
+            "1": {
+              "name": "keyword.other.extern.playwright"
+            }
+          }
+        },
+        {
+          "name": "meta.facts.playwright",
+          "begin": "\\+\\s*\\[",
+          "beginCaptures": {
+            "0": {
+              "name": "keyword.operator.provide.playwright"
+            }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.end.playwright"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#core-terms"
+            }
+          ]
+        },
+        {
+          "name": "punctuation.section.braces.begin.playwright",
+          "match": "\\{"
+        },
+        {
+          "name": "punctuation.section.braces.end.playwright",
+          "match": "\\}"
+        },
+        {
+          "include": "#core-terms"
+        }
+      ]
+    },
+    "type-block": {
+      "comment": "{{ ... }}: type declarations. Directly after -> the same braces are verbatim prose instead (#verbatim-prompt).",
+      "name": "meta.block.types.playwright",
+      "begin": "\\{\\{",
+      "end": "\\}\\}",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.section.block.begin.playwright"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.block.end.playwright"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#core-comments"
+        },
+        {
+          "name": "support.function.builtin.host.playwright",
+          "match": "!![a-z][A-Za-z0-9_]*"
+        },
+        {
+          "name": "keyword.other.type.playwright",
+          "match": "\\btype\\b"
+        },
+        {
+          "name": "support.type.primitive.playwright",
+          "match": "\\b(?:number|string)\\b"
+        },
+        {
+          "name": "support.type.any.playwright",
+          "match": "\\?"
+        },
+        {
+          "name": "keyword.operator.arrow.playwright",
+          "match": "->|→"
+        },
+        {
+          "name": "keyword.operator.sequence.playwright",
+          "match": "\\*"
+        },
+        {
+          "name": "punctuation.separator.annotation.playwright",
+          "match": ":"
+        },
+        {
+          "name": "entity.name.type.playwright",
+          "match": "\\b[a-z][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "verbatim-prompt": {
+      "comment": "-> {{ ... }}: prose taken as written, ending at the first unescaped }}.",
+      "name": "meta.verbatim.playwright",
+      "begin": "(->|→)[ \\t]*(\\{\\{)",
+      "end": "\\}\\}",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.prompt.playwright"
+        },
+        "2": {
+          "name": "punctuation.definition.verbatim.begin.playwright"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.verbatim.end.playwright"
+        }
+      },
+      "patterns": [
+        {
+          "name": "constant.character.escape.playwright",
+          "match": "\\\\\\}\\}"
+        },
+        {
+          "include": "#interpolation"
+        }
+      ]
+    },
+    "encounter": {
+      "patterns": [
+        {
+          "name": "keyword.control.encounter.begin.playwright",
+          "match": "@@[ \\t]*\\["
+        },
+        {
+          "name": "keyword.control.encounter.end.playwright",
+          "match": "\\][ \\t]*@@"
+        }
+      ]
+    },
+    "guard": {
+      "name": "meta.guard.playwright",
+      "begin": "\\?\\[",
+      "beginCaptures": {
+        "0": {
+          "name": "keyword.control.guard.playwright"
+        }
+      },
+      "end": "\\]",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.brackets.end.playwright"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#core-terms"
+        }
+      ]
+    },
+    "provide": {
+      "name": "meta.provide.playwright",
+      "begin": "\\+[ \\t]*=[ \\t]*\\[",
+      "beginCaptures": {
+        "0": {
+          "name": "keyword.operator.provide.playwright"
+        }
+      },
+      "end": "\\]",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.brackets.end.playwright"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#core-terms"
+        }
+      ]
+    },
+    "consume": {
+      "name": "meta.consume.playwright",
+      "begin": "-[ \\t]*(?:=[ \\t]*)?\\[",
+      "beginCaptures": {
+        "0": {
+          "name": "keyword.operator.consume.playwright"
+        }
+      },
+      "end": "\\]",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.brackets.end.playwright"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#core-terms"
+        }
+      ]
+    },
+    "return-target": {
+      "match": "(\\[)[ \\t]*(<-|←)[ \\t]*(\\])",
+      "captures": {
+        "1": {
+          "name": "punctuation.section.brackets.begin.playwright"
+        },
+        "2": {
+          "name": "keyword.control.return.playwright"
+        },
+        "3": {
+          "name": "punctuation.section.brackets.end.playwright"
+        }
+      }
+    },
+    "jump-target": {
+      "match": "(\\[->)[ \\t]*([^\\]\\s]*)[ \\t]*(\\])",
+      "captures": {
+        "1": {
+          "name": "keyword.control.jump.playwright"
+        },
+        "2": {
+          "name": "entity.name.tag.label.playwright"
+        },
+        "3": {
+          "name": "punctuation.section.brackets.end.playwright"
+        }
+      }
+    },
+    "arrows": {
+      "patterns": [
+        {
+          "name": "keyword.control.return.playwright",
+          "match": "<-|←"
+        },
+        {
+          "name": "keyword.control.prompt.playwright",
+          "match": "->|→"
+        },
+        {
+          "name": "keyword.control.choice.playwright",
+          "match": "=>|⇒"
+        }
+      ]
+    },
+    "label": {
+      "name": "entity.name.tag.label.playwright",
+      "match": "@[a-z][A-Za-z0-9_]*"
+    },
+    "interpolation": {
+      "comment": "{Var}: only an uppercase initial names a variable; {like this} is literal text.",
+      "name": "meta.interpolation.playwright",
+      "match": "(\\{)([A-Z][A-Za-z0-9_]*)(\\})",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.interpolation.begin.playwright"
+        },
+        "2": {
+          "name": "variable.other.playwright"
+        },
+        "3": {
+          "name": "punctuation.definition.interpolation.end.playwright"
+        }
+      }
+    },
+    "string": {
+      "name": "string.quoted.double.playwright",
+      "begin": "\"",
+      "end": "\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.playwright"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.playwright"
+        }
+      },
+      "patterns": [
+        {
+          "name": "constant.character.escape.playwright",
+          "match": "\\\\."
+        },
+        {
+          "include": "#interpolation"
+        }
+      ]
+    },
+    "core-terms": {
+      "comment": "Core terms. Anything with brackets is a nested region, so the ] that closes an application never closes the clause around it.",
+      "patterns": [
+        {
+          "include": "#core-comments"
+        },
+        {
+          "include": "#string"
+        },
+        {
+          "name": "keyword.operator.rewrite.playwright",
+          "match": "==>|⟹"
+        },
+        {
+          "name": "meta.application.builtin.playwright",
+          "begin": "(!!?[a-z][A-Za-z0-9_]*)\\s*(\\[)",
+          "beginCaptures": {
+            "1": {
+              "name": "support.function.builtin.playwright"
+            },
+            "2": {
+              "name": "punctuation.section.brackets.begin.playwright"
+            }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.end.playwright"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#core-terms"
+            }
+          ]
+        },
+        {
+          "name": "support.function.builtin.playwright",
+          "match": "!!?[a-z][A-Za-z0-9_]*"
+        },
+        {
+          "name": "meta.comparison.playwright",
+          "begin": "(==|<>|>=|<=|=|>|<)\\s*(\\[)",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.operator.comparison.playwright"
+            },
+            "2": {
+              "name": "punctuation.section.brackets.begin.playwright"
+            }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.end.playwright"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#core-terms"
+            }
+          ]
+        },
+        {
+          "name": "meta.application.playwright",
+          "begin": "\\b([a-z][A-Za-z0-9_]*)\\s*(\\[)",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.function.playwright"
+            },
+            "2": {
+              "name": "punctuation.section.brackets.begin.playwright"
+            }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.end.playwright"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#core-terms"
+            }
+          ]
+        },
+        {
+          "name": "variable.other.playwright",
+          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
+        },
+        {
+          "name": "constant.numeric.integer.playwright",
+          "match": "(?<![A-Za-z0-9_])-?[0-9]+\\b"
+        },
+        {
+          "name": "constant.other.symbol.playwright",
+          "match": "\\b[a-z][A-Za-z0-9_]*\\b"
+        },
+        {
+          "name": "keyword.operator.logical.negation.playwright",
+          "match": "~|¬"
+        },
+        {
+          "name": "keyword.operator.keep.playwright",
+          "match": "\\$"
+        },
+        {
+          "name": "keyword.operator.arithmetic.playwright",
+          "match": "[+\\-*/%^]"
+        },
+        {
+          "name": "punctuation.separator.sequence.playwright",
+          "match": ":"
+        },
+        {
+          "name": "punctuation.separator.comma.playwright",
+          "match": ","
+        },
+        {
+          "name": "punctuation.section.parens.playwright",
+          "match": "[()]"
+        }
+      ]
+    }
+  }
+}

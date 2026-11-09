@@ -1,0 +1,35 @@
+// SYNTAX TEST "source.playwright" "the world: facts, rules and host calls"
+
+<<
+// <-- meta.block.core.playwright punctuation.section.block.begin.playwright
+extern { player_at[X, Y] }
+// <------ meta.block.core.playwright keyword.other.extern.playwright
+//       ^^^^^^^^^ meta.block.core.playwright entity.name.function.playwright
+//                 ^ variable.other.playwright
++[coin, at[kitchen], score[(2 + 3 * 4)], greeting["Hello, {NAME}!"]]
+// <-- meta.facts.playwright keyword.operator.provide.playwright
+//^^^^ meta.facts.playwright constant.other.symbol.playwright
+//                            ^ keyword.operator.arithmetic.playwright
+//                                                ^^^^^^ string.quoted.double.playwright
+//                                                         ^^^^ string.quoted.double.playwright variable.other.playwright
+rule sprout { $seed, ~sprouted ==> sprouted }
+// <---- keyword.other.rule.playwright
+//   ^^^^^^ entity.name.function.rule.playwright
+//          ^ punctuation.section.braces.begin.playwright
+//            ^ keyword.operator.keep.playwright
+//                             ^^^ keyword.operator.rewrite.playwright
+rule roll { rolling, seed[S] ==> seed[!rand[S]], die[(!rand[S] % 6 + 1)] }
+//                                    ^^^^^ support.function.builtin.playwright
+//                                                             ^ keyword.operator.arithmetic.playwright
+//                                                               ^ constant.numeric.integer.playwright
+rule ask { asking ==> now[!!clock["hours"]], then[!!crank] }
+//                        ^^^^^^^ support.function.builtin.playwright
+//                                ^^^^^^^ string.quoted.double.playwright
+//                                                ^^^^^^^ support.function.builtin.playwright
+/* core's own block comment */ +[rule[1]]
+// <-- comment.block.playwright
+//                               ^^^^ meta.facts.playwright entity.name.function.playwright
+>>
+// <-- punctuation.section.block.end.playwright
+-> And back to the story.
+// ^^^^^^^^ source.playwright - meta.guard.playwright meta.provide.playwright meta.consume.playwright meta.block.core.playwright meta.block.types.playwright meta.verbatim.playwright meta.interpolation.playwright comment.line.double-slash.playwright comment.block.playwright entity.name.tag.label.playwright entity.name.function.playwright constant.other.symbol.playwright variable.other.playwright string.quoted.double.playwright keyword.control.prompt.playwright keyword.control.choice.playwright meta.block.core.playwright

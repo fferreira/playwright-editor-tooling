@@ -1,0 +1,5 @@
+<<
++[seed]
+rule spin { $seed ==> dizzy }
+>>
+-> Hi

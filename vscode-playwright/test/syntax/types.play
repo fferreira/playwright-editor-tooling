@@ -1,0 +1,22 @@
+// SYNTAX TEST "source.playwright" "type declarations"
+
+{{
+// <-- meta.block.types.playwright punctuation.section.block.begin.playwright
+  thing : type
+//^^^^^ entity.name.type.playwright
+//      ^ punctuation.separator.annotation.playwright
+//        ^^^^ keyword.other.type.playwright
+  health : number -> thing
+//         ^^^^^^ support.type.primitive.playwright
+//                ^^ keyword.operator.arrow.playwright - keyword.control.prompt.playwright
+  bag : ? * -> thing
+//      ^ support.type.any.playwright
+//        ^ keyword.operator.sequence.playwright
+  !!clock : string -> number
+//^^^^^^^ support.function.builtin.host.playwright
+//          ^^^^^^ support.type.primitive.playwright
+}}
+// <-- punctuation.section.block.end.playwright
+-> Everyone is well.
+// <-- keyword.control.prompt.playwright
+// ^^^^^^^^ source.playwright - meta.guard.playwright meta.provide.playwright meta.consume.playwright meta.block.core.playwright meta.block.types.playwright meta.verbatim.playwright meta.interpolation.playwright comment.line.double-slash.playwright comment.block.playwright entity.name.tag.label.playwright entity.name.function.playwright constant.other.symbol.playwright variable.other.playwright string.quoted.double.playwright keyword.control.prompt.playwright keyword.control.choice.playwright meta.block.types.playwright

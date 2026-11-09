@@ -36,7 +36,7 @@ declaration expects it, so elsewhere in a type it reads as a type constructor �
 `f : number -> type` and `!!fn : type` parse here and are syntax errors to core.
 
 Keeping it in step with core is a manual job: when core's grammar moves, run
-`../check.sh` against the new core — it parses core's corpus with this grammar
+`../check.sh grammar` against the new core — it parses core's corpus with this grammar
 (below) — and add a corpus test for the new shape.
 
 ## Repository layout
@@ -91,8 +91,8 @@ All 46 test cases in `test/corpus/basics.txt` should pass.
 ### Parsing core's own corpus
 
 The corpus tests pin shapes; core's `.core` files are the check that the
-grammar has not fallen behind. `../check.sh` runs this step last, against the
-first playwright-core checkout it finds: `$CORE_DIR`, then `../core` relative to
+grammar has not fallen behind. `../check.sh grammar` runs this step last, against
+the first playwright-core checkout `../tools/core_dir.sh` finds: `$CORE_DIR`, then `../core` relative to
 the repository root (playwright's own `core/`, when this repository is its
 `editor-tooling/` submodule), then `../playwright-core`. To run it by hand, from
 this directory, with `CORE` pointing at a playwright-core checkout:

@@ -1,0 +1,169 @@
+{
+  "name": "vscode-playwright",
+  "displayName": "Playwright Interactive Fiction",
+  "description": "Write Playwright stories: .play highlighting, errors and warnings as you type, and compiling to .nisus with the Playwright compiler built to WebAssembly.",
+  "version": "0.1.0",
+  "publisher": "fferreira",
+  "author": "Francisco Ferreira",
+  "license": "MIT",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fferreira/playwright-editor-tooling.git",
+    "directory": "vscode-playwright"
+  },
+  "homepage": "https://github.com/fferreira/playwright-editor-tooling/tree/main/vscode-playwright#readme",
+  "bugs": {
+    "url": "https://github.com/fferreira/playwright-editor-tooling/issues"
+  },
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "interactive fiction",
+    "narrative",
+    "playwright",
+    "play",
+    "nisus"
+  ],
+  "main": "./extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "In an untrusted workspace the folder's own settings cannot choose where compiled files are written, or turn on compiling when a file is saved.",
+      "restrictedConfigurations": [
+        "playwright.compile.outputDirectory",
+        "playwright.compile.onSave"
+      ]
+    },
+    "virtualWorkspaces": true
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "playwright",
+        "aliases": [
+          "Playwright",
+          "play"
+        ],
+        "extensions": [
+          ".play"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "playwright",
+        "scopeName": "source.playwright",
+        "path": "./syntaxes/playwright.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "playwright.compile",
+        "title": "Compile to .nisus",
+        "category": "Playwright",
+        "icon": "$(file-binary)"
+      },
+      {
+        "command": "playwright.showDisassembly",
+        "title": "Show Disassembly",
+        "category": "Playwright"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "playwright.compile",
+          "when": "editorLangId == playwright"
+        },
+        {
+          "command": "playwright.showDisassembly",
+          "when": "editorLangId == playwright"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "playwright.compile",
+          "when": "resourceLangId == playwright",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "playwright.compile",
+          "when": "resourceLangId == playwright",
+          "group": "1_playwright@1"
+        },
+        {
+          "command": "playwright.showDisassembly",
+          "when": "resourceLangId == playwright",
+          "group": "1_playwright@2"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "playwright.compile",
+          "when": "resourceExtname == .play",
+          "group": "1_playwright"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Playwright",
+      "properties": {
+        "playwright.compile.typeCheck": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Type-check the core a story compiles to against its `{{…}}` declarations, both as you type and when compiling. `playc` runs the same check on every build."
+        },
+        "playwright.compile.stripNames": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Write the `.nisus` with symbol names replaced by numbers, as `playc --strip-names` does: smaller, and what a Playdate build ships. A stripped file does not disassemble back to your names."
+        },
+        "playwright.compile.outputDirectory": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "markdownDescription": "Where **Compile to .nisus** writes. Empty means beside the `.play`. A relative path is resolved against the workspace folder, keeping each story's place in it, so `stories/a.play` compiles to `<dir>/stories/a.nisus`."
+        },
+        "playwright.compile.onSave": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "markdownDescription": "Compile a `.play` to `.nisus` every time it is saved."
+        }
+      }
+    }
+  },
+  "files": [
+    "extension.js",
+    "src/**",
+    "compiler/**",
+    "syntaxes/**",
+    "language-configuration.json",
+    "icon.png",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "vscode:prepublish": "./build.sh",
+    "build": "./build.sh",
+    "test": "node --test --test-reporter=spec test/unit/",
+    "test:syntax": "vscode-tmgrammar-test --grammar syntaxes/playwright.tmLanguage.json 'test/syntax/*.play'",
+    "test:integration": "node test/integration/launch.cjs",
+    "package": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "4.0.0",
+    "vscode-oniguruma": "1.7.0",
+    "vscode-textmate": "7.0.4",
+    "vscode-tmgrammar-test": "0.1.3"
+  }
+}
