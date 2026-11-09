@@ -10,10 +10,10 @@ Provides syntax highlighting and basic indentation support for **Helix** and **E
 
 ## What it covers
 
-The whole `.core` language as `core/play/lib/grammar.mly` and `lexer.mll` have
-it — the source of truth, in the playwright-core submodule — and every `.core`
-file core ships parses without an error, as does everything `playc --compile`
-writes for core's `.play` files. In particular:
+The whole `.core` language as playwright-core's `play/lib/grammar.mly` and
+`lexer.mll` have it — the source of truth — and every `.core` file core ships
+parses without an error, as does everything `playc --compile` writes for core's
+`.play` files. In particular:
 
 - **The `story { … }` section**: moments, items with their `+=[…]`/`-=[…]`
   clauses and targets, and encounters. The six story words are keywords only
@@ -31,17 +31,17 @@ do not nest here (the real lexer nests them), and a string is one token, so
 `{Var}` interpolations inside it are not separate nodes (an external scanner
 would be needed — see the comment in `grammar.js`).
 
-This crate is outside the workspace and nothing in the repository's gates reads
-it, so keeping it in step with core is a manual job: when core's grammar moves,
-parse core's corpus with it (below) and add a corpus test for the new shape.
+Keeping it in step with core is a manual job: when core's grammar moves, run
+`../check.sh` against the new core — it parses core's corpus with this grammar
+(below) — and add a corpus test for the new shape.
 
 ## Repository layout
 
 ```
-crates/tree-sitter-playwright-core/
+tree-sitter-playwright-core/
   grammar.js                 # grammar source (edit this)
   tree-sitter.json           # grammar metadata
-  Cargo.toml                 # Rust binding crate (standalone, not a workspace member)
+  Cargo.toml                 # Rust binding crate (standalone)
   bindings/rust/lib.rs       # LANGUAGE const + Rust smoke test
   bindings/rust/build.rs     # cc-compiles src/parser.c
   queries/
@@ -71,14 +71,14 @@ Rebuild only when you change `grammar.js`:
 # Prerequisites: Node.js + tree-sitter CLI
 npm install -g tree-sitter-cli
 
-cd crates/tree-sitter-playwright-core
+cd tree-sitter-playwright-core
 ./scripts/generate.sh   # runs tree-sitter generate
 ```
 
 ### Running corpus tests
 
 ```sh
-cd crates/tree-sitter-playwright-core
+cd tree-sitter-playwright-core
 tree-sitter test
 ```
 
@@ -87,11 +87,15 @@ All 45 test cases in `test/corpus/basics.txt` should pass.
 ### Parsing core's own corpus
 
 The corpus tests pin shapes; core's `.core` files are the check that the
-grammar has not fallen behind. From this directory, with the submodule checked
-out:
+grammar has not fallen behind. `../check.sh` runs this step last, against the
+first playwright-core checkout it finds: `$CORE_DIR`, then `../core` relative to
+the repository root (playwright's own `core/`, when this repository is its
+`editor-tooling/` submodule), then `../playwright-core`. To run it by hand, from
+this directory, with `CORE` pointing at a playwright-core checkout:
 
 ```sh
-git -C ../../core ls-files '*.core' | sed 's|^|../../core/|' \
+CORE=../../core   # inside a playwright checkout
+git -C "$CORE" ls-files '*.core' | sed "s|^|$CORE/|" \
   | while read -r f; do [ -L "$f" ] || echo "$f"; done > /tmp/core-files.txt
 tree-sitter parse -p . --quiet --stat --paths /tmp/core-files.txt
 ```
@@ -102,7 +106,7 @@ at files already in the list).
 ### Running Rust binding tests
 
 ```sh
-cd crates/tree-sitter-playwright-core
+cd tree-sitter-playwright-core
 cargo test
 ```
 
@@ -113,7 +117,7 @@ cargo test
 ### Install
 
 ```sh
-cd crates/tree-sitter-playwright-core
+cd tree-sitter-playwright-core
 ./scripts/install-helix.sh
 ```
 
@@ -152,7 +156,7 @@ indent = { tab-width = 4, unit = "    " }
 
 [[grammar]]
 name = "playwright_core"
-source = { path = "/absolute/path/to/crates/tree-sitter-playwright-core" }
+source = { path = "/absolute/path/to/tree-sitter-playwright-core" }
 ```
 
 Then copy `queries/*.scm` to `~/.config/helix/runtime/queries/playwright_core/` and run
@@ -167,7 +171,7 @@ Requires **Emacs 29+** built with tree-sitter support (`--with-tree-sitter`).
 ### Install
 
 ```sh
-cd crates/tree-sitter-playwright-core
+cd tree-sitter-playwright-core
 ./scripts/install-emacs.sh
 ```
 

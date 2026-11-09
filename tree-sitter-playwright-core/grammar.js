@@ -1,7 +1,7 @@
 /**
  * @file Tree-sitter grammar for Core Playwright, the `.core` IR
- * @see core/play/lib/grammar.mly and core/play/lib/lexer.mll — the
- *      authoritative grammar (source of truth), in the playwright-core submodule
+ * @see play/lib/grammar.mly and play/lib/lexer.mll in playwright-core — the
+ *      authoritative grammar (source of truth)
  * @license MIT
  */
 
