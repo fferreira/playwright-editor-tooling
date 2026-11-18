@@ -78,7 +78,8 @@
 
    :language 'playwright_core
    :feature 'number
-   '((number) @font-lock-number-face)
+   '((number) @font-lock-number-face
+     (float)  @font-lock-number-face)
 
    :language 'playwright_core
    :feature 'type

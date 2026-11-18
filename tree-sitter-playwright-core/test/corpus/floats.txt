@@ -1,0 +1,86 @@
+==========================
+Float literals
+==========================
+
++[price[3.0], big[3.5e10, 1e5, 2.5E-3, 1E+5], neg[-2.5], mixed[3, 3.0]]
+
+---
+
+(program
+  (fact
+    (term_list
+      (term (application head: (symbol) (term_list (term (float)))))
+      (term (application head: (symbol)
+        (term_list
+          (term (float))
+          (term (float))
+          (term (float))
+          (term (float)))))
+      (term (application head: (symbol)
+        (term_list (term (unary_expression operand: (float))))))
+      (term (application head: (symbol)
+        (term_list (term (number)) (term (float))))))))
+
+==========================
+Floats in guards and arithmetic
+==========================
+
+rule r { price[P], >=[P, 2.5], <[P, 1e3] ==> cost[P * 1.5 - 0.25], paid[!round[P]] }
+
+---
+
+(program
+  (rule_construct
+    name: (symbol)
+    (rule_body
+      (guard (pos_guard (term (application head: (symbol) (term_list (term (variable)))))))
+      (guard (cmp_guard left: (term (variable)) right: (term (float))))
+      (guard (cmp_guard left: (term (variable)) right: (term (float))))
+      (rule_arrow)
+      (term_list
+        (term
+          (application head: (symbol)
+            (term_list
+              (term
+                (binary_expression
+                  left: (binary_expression
+                    left: (variable)
+                    right: (float))
+                  right: (float))))))
+        (term
+          (application head: (symbol)
+            (term_list
+              (term
+                (special_application head: (special)
+                  (term_list (term (variable))))))))))))
+
+==========================
+The int and float base types, and the names they are elsewhere
+==========================
+
+{{
+  item : type
+  price : float -> item
+  paid : int -> item
+  !!sqrt : float -> float
+  number : type
+}}
++[float[1.5], int[2], number[3]]
+
+---
+
+(program
+  (signature_block
+    (signature_item (type_declaration name: (symbol)))
+    (signature_item (constructor_signature name: (symbol)
+      (type_expr (base_type) (type_constructor (symbol)))))
+    (signature_item (constructor_signature name: (symbol)
+      (type_expr (base_type) (type_constructor (symbol)))))
+    (signature_item (host_signature name: (host_function)
+      (type_expr (base_type) (base_type))))
+    (signature_item (type_declaration name: (symbol))))
+  (fact
+    (term_list
+      (term (application head: (symbol) (term_list (term (float)))))
+      (term (application head: (symbol) (term_list (term (number)))))
+      (term (application head: (symbol) (term_list (term (number))))))))

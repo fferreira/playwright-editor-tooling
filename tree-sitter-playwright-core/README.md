@@ -25,15 +25,20 @@ parses without an error, as does everything `playc --compile` writes for core's
   `!ffi["fn", a, b]` (`host_call`). Both real parsers expand it before anything
   else sees it, and the printer writes the expansion, so it only ever appears
   in hand-written text — which is exactly the text an editor is for.
-- **`{{ !!fn : number -> number }}`**, the signature that types a host
+- **`{{ !!fn : int -> int }}`**, the signature that types a host
   function (`host_signature`), spelled the way the call is.
+- **Floats** (`float`): `3.0`, `3.5e10`, `1e5`, `2.5E-3` — a fraction, an
+  exponent or both, as `lexer.mll`'s `FLOAT` has them, by the same longest
+  match, so `5.` is the integer `5` and an error exactly where core says so.
+  The base types are `int`, `float` and `string` (core v0.6.0 renamed `number`
+  to `int`, which makes `number` an ordinary name).
 
 Three things are approximations, all harmless to a highlighter: block comments
 do not nest here (the real lexer nests them); a string is one token, so `{Var}`
 interpolations inside it are not separate nodes (an external scanner would be
 needed — see the comment in `grammar.js`); and `type` is a keyword only where a
 declaration expects it, so elsewhere in a type it reads as a type constructor —
-`f : number -> type` and `!!fn : type` parse here and are syntax errors to core.
+`f : int -> type` and `!!fn : type` parse here and are syntax errors to core.
 
 Keeping it in step with core is a manual job: when core's grammar moves, run
 `../check.sh grammar` against the new core — it parses core's corpus with this grammar
@@ -256,14 +261,14 @@ rule {
 // Type signature block
 {{
     counter : type
-    counter : number -> counter
+    counter : int -> counter
 }}
 
 // Facts the host owns: the story reads them and never changes them
 extern { player_at[X, Y] }
 
 // Ask the host: !!roll[6] is !ffi["roll", 6], and a bare !!clock is !ffi["clock"]
-{{ !!roll : number -> number  !!clock : string }}
+{{ !!roll : int -> int  !!clock : string }}
 rule ask { asking ==> rolled[!!roll[6]], now[!!clock] }
 
 // The story section, as playc --compile writes it

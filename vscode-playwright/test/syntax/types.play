@@ -6,15 +6,20 @@
 //^^^^^ entity.name.type.playwright
 //      ^ punctuation.separator.annotation.playwright
 //        ^^^^ keyword.other.type.playwright
-  health : number -> thing
-//         ^^^^^^ support.type.primitive.playwright
-//                ^^ keyword.operator.arrow.playwright - keyword.control.prompt.playwright
+  health : int -> thing
+//         ^^^ support.type.primitive.playwright
+//             ^^ keyword.operator.arrow.playwright - keyword.control.prompt.playwright
+  price : float -> thing
+//        ^^^^^ support.type.primitive.playwright
+  legacy : number -> thing
+//         ^^^^^^ - support.type.primitive.playwright
   bag : ? * -> thing
 //      ^ support.type.any.playwright
 //        ^ keyword.operator.sequence.playwright
-  !!clock : string -> number
+  !!clock : string -> int
 //^^^^^^^ support.function.builtin.host.playwright
 //          ^^^^^^ support.type.primitive.playwright
+//                    ^^^ support.type.primitive.playwright
 }}
 // <-- punctuation.section.block.end.playwright
 -> Everyone is well.

@@ -11,8 +11,9 @@
 module.exports = grammar({
   name: 'playwright_core',
 
-  // 'rule' is a keyword; 'type', 'number', 'string' are keywords inside
-  // signature blocks.  Declaring the word token enables keyword extraction:
+  // 'rule' is a keyword; 'type', 'int', 'float', 'string' are keywords inside
+  // signature blocks.  Outside one they are ordinary symbols, as grammar.mly's
+  // `symbol_name` re-admits them — `float[X]` is an application.  Declaring the word token enables keyword extraction:
   // these strings won't match as plain symbols at positions where the keyword
   // token is valid.
   word: $ => $.symbol,
@@ -193,7 +194,9 @@ module.exports = grammar({
       seq('(', $.type_expr, ')'),
     ),
 
-    base_type: _ => choice('number', 'string'),
+    // core v0.6.0 renamed `number` to `int` and added `float`. `number` is an
+    // ordinary name now, so where it still appears it is a type_constructor.
+    base_type: _ => choice('int', 'float', 'string'),
     any_type: _ => '?',
     type_constructor: $ => $.symbol,
 
@@ -327,6 +330,7 @@ module.exports = grammar({
       seq('(', $._expression, ')'),
       $.list,
       $.string,
+      $.float,
       $.number,
       $.special_application,  // must precede $.special
       $.host_call,
@@ -421,6 +425,13 @@ module.exports = grammar({
     // a literal (-9223372036854775808 included, to_review.md R68). Here that
     // minus is a unary_expression, which is the same thing for a highlighter.
     number: _ => /\d+/,
+
+    // A float literal: digits with a fraction, an exponent, or both — 3.0,
+    // 3.5e10, 1e5, 2.5E-3. The same two rules as lexer.mll's FLOAT, and the
+    // same longest match decides between this and `number`: `1e5` is one
+    // float, while `5.` is the number 5 and a stray '.', and `1e` is 1 and the
+    // symbol e, exactly as ocamllex backs off. Unsigned for `number`'s reason.
+    float: _ => /\d+(\.\d+)?[eE][+-]?\d+|\d+\.\d+/,
 
     // Double-quoted string.  Modelled as a single atomic token so that comment-
     // like sequences inside strings (e.g. "//pattern" or "/* ... */") are never

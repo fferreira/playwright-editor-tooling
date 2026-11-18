@@ -12,6 +12,11 @@ extern { player_at[X, Y] }
 //                            ^ keyword.operator.arithmetic.playwright
 //                                                ^^^^^^ string.quoted.double.playwright
 //                                                         ^^^^ string.quoted.double.playwright variable.other.playwright
++[price[2.5], big[1e5, -2.5E-3], whole[3]]
+//      ^^^ constant.numeric.float.playwright
+//                ^^^ constant.numeric.float.playwright
+//                      ^^^^^^ constant.numeric.float.playwright
+//                                     ^ constant.numeric.integer.playwright
 rule sprout { $seed, ~sprouted ==> sprouted }
 // <---- keyword.other.rule.playwright
 //   ^^^^^^ entity.name.function.rule.playwright

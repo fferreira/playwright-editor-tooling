@@ -461,9 +461,9 @@ Type signature block
 
 {{
   question : type
-  factorial : number -> question
+  factorial : int -> question
   answer : type
-  computing : number -> number -> answer
+  computing : int -> int -> answer
 }}
 
 ---
@@ -901,9 +901,9 @@ Host function signatures
 ==========================
 
 {{
-  !!roll : number -> number
+  !!roll : int -> int
   !!clock : string
-  !!log : string -> ? -> number
+  !!log : string -> ? -> int
   die : type
 }}
 

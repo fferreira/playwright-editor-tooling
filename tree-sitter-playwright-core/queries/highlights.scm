@@ -53,6 +53,7 @@
 
 ; ── Literals ────────────────────────────────────────────────────────────────
 (number) @number
+(float)  @number.float
 
 ; Strings are atomic tokens (no inner nodes); the entire string is @string.
 ; For {var} interpolation highlighting inside strings, an external scanner
